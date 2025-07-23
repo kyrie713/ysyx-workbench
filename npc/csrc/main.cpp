@@ -1,46 +1,46 @@
-// #include <stdio.h>
-
-// int main() {
-//   printf("Hello, ysyx!\n");
-//   return 0;
-// }
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
- 
-#include "Vtop.h"  // create `top.v`,so use `Vtop.h`
+#include <nvboard.h> 
+#include "Vtop.h"  
 #include "verilated.h"
- 
-#include "verilated_vcd_c.h" //可选，如果要导出vcd则需要加上
- 
+#include "verilated_vcd_c.h" // 可选，如果要导出vcd则需要加上
+
+void nvboard_bind_all_pins(Vtop* top);
+
 int main(int argc, char** argv, char** env) {
- 
-  VerilatedContext* contextp = new VerilatedContext;
-  contextp->commandArgs(argc, argv);
-  Vtop* top = new Vtop{contextp};
-  
- 
-  VerilatedVcdC* tfp = new VerilatedVcdC; //初始化VCD对象指针
-  contextp->traceEverOn(true); //打开追踪功能
-  top->trace(tfp, 0); //
-  tfp->open("wave.vcd"); //设置输出的文件wave.vcd
- 
- 
-  while (!contextp->gotFinish()) {
-    int a = rand() & 1;
-    int b = rand() & 1;
-    top->a = a;
-    top->b = b;
-    top->eval();
-    printf("a = %d, b = %d, f = %d\n", a, b, top->f);
- 
-    tfp->dump(contextp->time()); //dump wave
-    contextp->timeInc(1); //推动仿真时间
- 
-    assert(top->f == a ^ b);
-  }
-  delete top;
-  tfp->close();
-  delete contextp;
-  return 0;
+    
+    VerilatedContext* contextp = new VerilatedContext;
+    contextp->commandArgs(argc, argv);
+    Vtop* top = new Vtop{contextp};
+    nvboard_bind_all_pins(top);
+    nvboard_init();
+
+    
+    VerilatedVcdC* tfp = new VerilatedVcdC; 
+    contextp->traceEverOn(true);
+    top->trace(tfp, 99); 
+    tfp->open("wave.vcd"); 
+
+    
+    top->clk = 0;
+    top->clrn = 1; 
+    top->ps2_clk = 0;
+    top->ps2_data = 0;
+    top->led_off = 0; 
+
+    
+    while (!contextp->gotFinish()) {
+        nvboard_update(); 
+        contextp->timeInc(1); 
+        top->clk = !top->clk; 
+        top->eval(); 
+        tfp->dump(contextp->time()); 
+    }
+
+    
+    delete top;
+    tfp->close();
+    delete contextp;
+    return 0;
 }
