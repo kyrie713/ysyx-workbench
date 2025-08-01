@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include "memory/paddr.h"
 
 static int is_batch_mode = false;
 
@@ -49,11 +50,131 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+  nemu_state.state = NEMU_QUIT;
   return -1;
 }
 
 static int cmd_help(char *args);
-
+static int cmd_si(char *args){
+  char *arg = strtok(NULL, " ");
+  int i = 0;
+  if(arg == NULL)
+	{
+		cpu_exec(1);
+	}
+  else 
+  {
+    i = strtol(arg,NULL,10);
+    cpu_exec(i);   
+  }
+  return 0;
+}
+void display_wp();
+static int cmd_info(char *args){
+  char *arg = strtok(NULL, " ");
+  if(strcmp(arg,"r") == 0){
+    isa_reg_display();
+    
+  }
+  else if( strcmp(arg,"w")==0)
+  {
+    display_wp();
+    
+  }
+  return 0;
+}
+static int cmd_x(char *args){
+  char *argone = strtok(NULL," ");
+  char *argtwo = strtok(NULL," ");
+  int i = strtol(argone,NULL,10);
+  uint32_t address = strtol(argtwo,NULL,16);
+  
+  for(int j = 0;j<i;j++)
+  {
+    printf("0x%08x: 0x%08x\n",address+j*4,paddr_read(address+j*4,4));
+  }
+  return 0;
+}
+word_t expr(char *e, bool *success);
+static int cmd_p(char *args){
+  // char *arg = strtok(args," ");
+  if(args ==NULL)
+  {
+    printf("empty exprerssion\n");
+  }
+  else {
+    bool success = false;
+    uint32_t result = expr(args,&success);
+    if(success)
+    {
+      printf("result = %u\n",result);
+    }
+    else {
+      printf("Error\n");
+    }
+  }
+  return 0;
+}
+static int cmd_ext(char *args){
+  const char *input_file_path = "/home/huang/ysyx-workbench/nemu/tools/gen-expr/input";
+  FILE *input_file = fopen(input_file_path,"r");
+  if(input_file == NULL)
+  {
+    perror("Failed to open input file");
+    return -1;
+  }
+  char line[4096];
+  int all_test = 0,past_test = 0;
+  while(fgets(line,sizeof(line),input_file)){
+    char *expected_result_str = strtok(line," ");
+    char *expr_str = strtok(NULL,"\n");
+    if (expected_result_str == NULL || expr_str == NULL) {
+      fprintf(stderr, "Invalid test case format: %s", line);
+      continue;
+    }
+    int expected_result = atoi(expected_result_str);
+    bool success = false;
+    word_t result = expr(expr_str,&success);
+    all_test ++;
+    if(success && result == expected_result)
+    {
+      past_test ++;
+    }    
+  }
+  printf("%d test,%d passed\n",all_test,past_test);
+  fclose(input_file);
+  return 0;
+}
+void set_wp(char *arg, word_t value);
+void delete_wp(int n);
+static int cmd_w(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'w EXPR'\n");
+    return 0;
+  }
+  bool success;
+  word_t res = expr(args, &success);
+  if(!success)
+    printf("The expression is problematic\n");
+  else 
+    set_wp(args, res);
+  
+  return 0;
+}
+static int cmd_d(char *args)
+{
+  if(args == NULL)
+  {
+    printf("Unknown input, the standard format is 'd N'\n");
+    return 0;
+  }
+  char *arg = strtok(NULL, " ");
+  int n = strtol(arg, NULL, 10);
+  delete_wp(n);
+  return 0;
+}
 static struct {
   const char *name;
   const char *description;
@@ -64,7 +185,13 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-
+  { "si", "Execute the program step by step and pause after executing N instructions. If N is not specified, the default value is 1",cmd_si},
+  { "info", "Print the program state", cmd_info},
+  { "x", "scanf men", cmd_x},
+  { "p", "expression evaluation",cmd_p},
+  { "ext","test",cmd_ext},
+  { "w","watchpoint",cmd_w},
+  { "d","deletepoint",cmd_d},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
@@ -137,7 +264,6 @@ void sdb_mainloop() {
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-
   /* Initialize the watchpoint pool. */
   init_wp_pool();
 }

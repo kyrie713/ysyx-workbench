@@ -24,8 +24,30 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
+  printf("pc\t\t0x%08x\n",cpu.pc);
+  for(int j = 0;j<32;j++)
+  {
+    printf("%s\t\t0x%08x\n",regs[j],cpu.gpr[j]);
+  }
+  
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
+
+  if(strcmp(s+1,"pc")==0)
+  {
+    // static char hex_str[9];  
+    // snprintf(hex_str, sizeof(hex_str), "%08x", cpu.pc);
+    return cpu.pc;
+  }
+  for(int i = 0;i <32;i++){
+    if(strcmp(s+1,regs[i])==0){
+      *success = true;
+      return cpu.gpr[i];
+      
+    }
+
+  }
+  *success = false;
   return 0;
 }
