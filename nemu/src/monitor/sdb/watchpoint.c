@@ -67,18 +67,39 @@ void free_wp(WP *wp)
     printf("No watchpoints are using\n");
     assert(0);
   }
+  // if(wp->next == NULL)
+  // {
+  //   wp->next = free_;
+  //   free_ = wp;
+  //   head = NULL;
+  //   return;
+  // }
   if(wp->next == NULL)
   {
+    if(head == wp)
+    {
+        head = NULL;
+    }
+    else
+    {
+        WP *tmp = head;
+        while(tmp->next != wp)
+        {
+            tmp = tmp->next;
+        }
+        tmp->next = NULL;
+    }
     wp->next = free_;
     free_ = wp;
-    head = NULL;
     return;
-  }
+}
+
   else if(wp->next != NULL && wp == head)
   {
     head = wp->next;//指向下一个监视点
     wp->next = free_;
     free_ = wp;
+    printf("New head: %p\n", (void *)head);
     return;
   }
   else {
@@ -98,7 +119,7 @@ void free_wp(WP *wp)
 {
   WP *new = new_wp();
   new->old_value = value;
-  strcpy(new->expr, arg);
+  strcpy(new->expr, arg);//将传入的表达式 arg 复制到新监视点的 expr 成员中
   printf("Hardware watchpoint %d: %s\n", new->NO, new->expr);
 }
 void scan_wp()    //scan all watchpoints
@@ -154,6 +175,6 @@ void delete_wp(int n)  //delete the watchpoint, its NO is n.
       printf("Deleted\n");
     }
   }
-}
+} 
 #endif
 

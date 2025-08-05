@@ -15,7 +15,7 @@ int main(int argc, char** argv, char** env) {
     Vtop* top = new Vtop{contextp};
     nvboard_bind_all_pins(top);
     nvboard_init();
-
+  
     
     VerilatedVcdC* tfp = new VerilatedVcdC; 
     contextp->traceEverOn(true);
