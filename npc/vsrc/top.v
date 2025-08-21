@@ -1,185 +1,189 @@
-module ps2_keyboard(clk,clrn,ps2_clk,ps2_data,data,
-                    ready,nextdata_n,overflow);
-    input clk,clrn,ps2_clk,ps2_data;
-    input nextdata_n;
-    output [7:0] data;
-    output reg ready;
-    output reg overflow;     // fifo overflow
-    // internal signal, for test
-    reg [9:0] buffer;        // ps2_data bits
-    reg [7:0] fifo[7:0];     // data fifo
-    reg [2:0] w_ptr,r_ptr;   // fifo write and read pointers
-    reg [3:0] count;  // count ps2_data bits
-    // detect falling edge of ps2_clk
-    reg [2:0] ps2_clk_sync;
-
-    always @(posedge clk) begin
-        ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
-    end
-
-    wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
-
-    always @(posedge clk) begin
-        if (clrn) begin // reset
-            count <= 0; w_ptr <= 0; r_ptr <= 0; overflow <= 0; ready<= 0;
-        end
-        else begin
-            if ( ready ) begin // read to output next data
-                if(nextdata_n == 1'b0) //read next data
-                begin
-                    r_ptr <= r_ptr + 3'b1;
-                    if(w_ptr==(r_ptr+1'b1)) //empty
-                        ready <= 1'b0;
-                end
-            end
-            if (sampling) begin
-              if (count == 4'd10) begin
-                if ((buffer[0] == 0) &&  // start bit
-                    (ps2_data)       &&  // stop bit
-                    (^buffer[9:1])) begin      // odd  parity
-                    fifo[w_ptr] <= buffer[8:1];  // kbd scan code
-                    w_ptr <= w_ptr+3'b1;
-                    ready <= 1'b1;
-                    overflow <= overflow | (r_ptr == (w_ptr + 3'b1));
-                end
-                count <= 0;     // for next
-              end else begin
-                buffer[count] <= ps2_data;  // store ps2_data
-                count <= count + 3'b1;
-              end
-            end
-        end
-    end
-    assign data = fifo[r_ptr]; //always set output data
-
-
-endmodule
-function logic [7:0] seg(
-    input [3:0] b
+module top(
+    input clk,
+    input rst,
+    output [31:0] PC,
+    output [31:0] inst,
+    // 新增：调试寄存器输出
+    output [31:0] debug_zero,
+    output [31:0] debug_ra,
+    output [31:0] debug_sp,
+    output [31:0] debug_gp,
+    output [31:0] debug_tp,
+    output [31:0] debug_s0,
+    output [31:0] debug_s1,
+    output [31:0] debug_a0,
+    output [31:0] debug_a1,
+    output [31:0] debug_a2,
+    output [31:0] debug_a3,
+    output [31:0] debug_a4,
+    output [31:0] debug_a5
 );
-    logic [7:0] h;
-    case(b) 
-    4'h0:h = 8'b11111101;
-    4'h1:h = 8'b01100000;
-    4'h2:h = 8'b11011010;
-    4'h3:h = 8'b11110010;
-    4'h4:h = 8'b01100110;
-    4'h5:h = 8'b10110110;
-    4'h6:h = 8'b10111110;
-    4'h7:h = 8'b11100000;
-    4'h8:h = 8'b11111110;
-    4'h9:h = 8'b11110110;
-    4'ha:h = 8'b11101110;
-    4'hb:h = 8'b00111110;
-    4'hc:h = 8'b10011100;
-    4'hd:h = 8'b01111010;
-    4'he:h = 8'b10011110;
-    4'hf:h = 8'b10001110;
-    default: h = 8'b0;
-    endcase
-    return ~h;
-endfunction
-typedef logic [7:0] ascii_map_t [100];
-ascii_map_t ascii_normal = '{
-    8'h1C: 8'h61,
-    8'h32: 8'h62,
-    8'h21: 8'h63,
-    8'h23: 8'h64,
-    8'h24: 8'h65,
-    8'h2B: 8'h66,
-    8'h34: 8'h67,
-    8'h33: 8'h68,
-    8'h43: 8'h69,
-    8'h3B: 8'h6A,
-    8'h42: 8'h6B,
-    8'h4B: 8'h6C,
-    8'h3A: 8'h6D,
-    8'h31: 8'h6E,
-    8'h44: 8'h6F,
-    8'h4D: 8'h70,
-    8'h15: 8'h71,
-    8'h2D: 8'h72,
-    8'h1B: 8'h73,
-    8'h2C: 8'h74,
-    8'h3C: 8'h75,
-    8'h2A: 8'h76,
-    8'h1D: 8'h77,
-    8'h22: 8'h78,
-    8'h35: 8'h79,
-    8'h1A: 8'h7A,
-    8'h45: 8'h30,
-    8'h16: 8'h31,
-    8'h1E: 8'h32,
-    8'h26: 8'h33,
-    8'h25: 8'h34,
-    8'h2E: 8'h35,
-    8'h36: 8'h36,
-    8'h3D: 8'h37,
-    8'h3E: 8'h38,
-    8'h46: 8'h39,
-    default:8'h00
-
-};
-module top (
-    input clk,clrn,ps2_clk,ps2_data,led_off,
-    output logic [7:0] segs[0:7],
-    output logic [7:0] press_count
-
-);
-    logic nextdata_n,ready,overflow;
-    logic key_pressed,key_released;
-    logic [7:0] data;
-    logic [7:0] last_key;
-    ps2_keyboard a0(
-        .clk(clk),
-        .clrn(clrn),
-        .ps2_clk(ps2_clk),
-        .ps2_data(ps2_data),
-        .data(data),
-        .ready(ready),
-        .nextdata_n(nextdata_n),
-        .overflow(overflow)
-    );
-    always @(posedge clk) begin
-        if(clrn) begin
-            press_count <= 0;
-            key_pressed <= 0;
-            key_released <= 1;
-            last_key <= 8'h00;
-            segs <='{8{8'hFF}};
-            nextdata_n <=0;
-        end 
-        else begin 
-            if(ready) begin 
-                last_key <=data;
-                if(data == 8'hF0) begin 
-                    key_released <=1;
-                end else begin 
-                    key_pressed <=1;
-                    key_released <=0;
-                end
-                if(key_pressed && key_released) begin 
-                    press_count <= press_count +1;
-                    key_pressed <=0;
-                    key_released <=1;
-                end
-            end
-        end
-    end 
-    always_comb begin
-        segs[0] = seg(ascii_normal[last_key[6:0]][3:0]);
-        segs[1] = seg(ascii_normal[last_key[6:0]][7:4]);
-        segs[2] = seg(last_key[3:0]);
-        segs[3] = seg(last_key[7:4]);
-        segs[4] = seg(press_count[3:0]);
-        segs[5] = seg(press_count[7:4]);
-
-        if(key_released&&led_off) begin
-            for (int i = 0; i < 4; i++) begin
-            segs[i] = 8'hFF;
-
-        end
-        end
+// 定义内部信号
+    wire [31:0] PC_plus_4;
+    wire [31:0] ALU_OUT;
+    wire [31:0] R1_data;
+    wire [31:0] R2_data;
+    wire [31:0] MemReadData;
+    wire [31:0] RegWriteData;
+    wire [31:0] MemWriteData;
+    wire [31:0] MemReadDataoneword;
+    wire Reg_WE;
+    wire I_jalr;
+    wire [4:0] r1;
+    wire [4:0] r2;
+    wire [4:0] rd;
+    wire [31:0] imm;
+    wire R_TYPE;
+    wire I_TYPE_ARITH;
+    wire L_TYPE_LOAD;
+    wire S_TYPE;
+    wire U_TYPE;
+    wire I_TYPE;
+    wire MemWEn;
+    wire B_TYPE;
+    wire J_TYPE;
+    wire U_lui;
+    wire R_add;
+    wire l_lw;
+    wire l_lbu;
+    wire I_add; 
+    wire S_sw;
+    wire S_sb;
+    wire I_ebreak;
+    wire [3:0] wmask;
+    // 指令存储器接口
+    import "DPI-C" function int pmem_read(input int raddr);
+    assign inst = pmem_read(PC);//问题就是出现在这里，先读出来的值是地址为0的内存块的值
+    always @(*) begin
+        $display("PC :0x%08x",PC);
     end
-endmodule
+    // 数据存储器接口
+    wire [31:0] mem_addr = ALU_OUT;
+    assign MemReadData = pmem_read(mem_addr);
+    // always @(*) begin
+    //     $display("0x%08x\n",MemReadData);
+    //     $display("ALU_OUT = 0x%08x\n",ALU_OUT);
+    // end
+    // DPI-C写函数
+    import "DPI-C" function void pmem_write(
+        input int waddr, input int wdata, input int wmask);
     
+    // 存储器写操作（时钟同步）
+    always @(posedge clk) begin
+        if (MemWEn) begin
+            $display("Verilog: Writing to addr=0x%08x, data=0x%08x, mask=0x%x", 
+                mem_addr, MemWriteData, wmask);
+            pmem_write(mem_addr, MemWriteData,  {28'b0, wmask});
+        end
+    end
+
+    import "DPI-C" function void notify_ebreak();
+    
+    always @(posedge clk) begin
+        if(I_ebreak && $time > 0) begin //避免仿真初期误触发
+            $display("[TRAP] EBREAK at PC = 0x%08x",PC);
+            notify_ebreak();
+        end
+    end
+
+    PC pc(
+        .I_jalr(I_jalr),
+        .ALU_OUT(ALU_OUT),
+        .clk(clk),
+        .rst(rst),
+        .PC(PC),
+        .PC_plus_4(PC_plus_4)
+    );
+
+    IDU idu(
+        .inst(inst),
+        .R_TYPE(R_TYPE),
+        .I_TYPE_ARITH(I_TYPE_ARITH),
+        .L_TYPE_LOAD(L_TYPE_LOAD),
+        .S_TYPE(S_TYPE),
+        .U_TYPE(U_TYPE),
+        .I_TYPE(I_TYPE),
+        .MemWEn(MemWEn),
+        .B_TYPE(B_TYPE),
+        .J_TYPE(J_TYPE),
+        .I_jalr(I_jalr),
+        .U_lui(U_lui),
+        .R_add(R_add),
+        .l_lw(l_lw),
+        .l_lbu(l_lbu),
+        .I_add(I_add),
+        .S_sw(S_sw),
+        .S_sb(S_sb),
+        .I_ebreak(I_ebreak),
+        .imm(imm),
+        .r1(r1),
+        .r2(r2),
+        .rd(rd)
+    );
+
+    LSU lsu (
+        .MemReadData(MemReadData),
+        .R2_data(R2_data),
+        .ALU_OUT(ALU_OUT),
+        .PC_plus_4(PC_plus_4),
+        .l_lw(l_lw),
+        .l_lbu(l_lbu),
+        .I_jalr(I_jalr),
+        .S_sb(S_sb),
+        .S_sw(S_sw),
+        .R_TYPE(R_TYPE),
+        .I_TYPE_ARITH(I_TYPE_ARITH),
+        .U_TYPE(U_TYPE),
+        .J_TYPE(J_TYPE),
+        .I_TYPE(I_TYPE),
+        .RegWriteData(RegWriteData),
+        .MemWriteData(MemWriteData),
+        .MemReadDataoneword(MemReadDataoneword),
+        .Reg_WE(Reg_WE),
+        .wmask(wmask)
+    );
+
+    RegisterFile  regfile (
+        .clk(clk),
+        .wdata(RegWriteData),
+        .waddr(rd),
+        .wen(Reg_WE),
+        .raddr_1(r1),
+        .raddr_2(r2),
+        .rdata_1(R1_data),
+        .rdata_2(R2_data),
+        // 连接调试寄存器输出
+        .zero(debug_zero),
+        .ra(debug_ra),
+        .sp(debug_sp),
+        .gp(debug_gp),
+        .tp(debug_tp),
+        .s0(debug_s0),
+        .s1(debug_s1),
+        .a0(debug_a0),
+        .a1(debug_a1),
+        .a2(debug_a2),
+        .a3(debug_a3),
+        .a4(debug_a4),
+        .a5(debug_a5)
+    );
+
+    ALU alu (
+        .R_TYPE(R_TYPE),
+        .I_TYPE(I_TYPE),
+        .S_TYPE(S_TYPE),
+        .B_TYPE(B_TYPE),
+        .J_TYPE(J_TYPE),
+        .U_TYPE(U_TYPE),
+        .R_add(R_add),
+        .I_add(I_add),
+        .I_jalr(I_jalr),
+        .l_lbu(l_lbu),
+        .l_lw(l_lw),
+        .rdata_1(R1_data),
+        .rdata_2(R2_data),
+        .imm(imm),
+        .pc(PC),
+        .ALU_OUT(ALU_OUT)
+    );
+endmodule
