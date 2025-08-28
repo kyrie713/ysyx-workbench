@@ -109,10 +109,10 @@ module IDU(
             end
         end
         default :begin
-             $display("Unknown opcode: %d", opcode);
+             //$display("Unknown opcode: %d", opcode);
         end 
     endcase
-    $display("addi_TYPE: %b", I_add);//调试
+    //$display("addi_TYPE: %b", I_add);//调试
     I_TYPE = I_TYPE_ARITH | L_TYPE_LOAD | I_jalr;
     U_TYPE = U_lui;
 

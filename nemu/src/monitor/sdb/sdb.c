@@ -27,17 +27,18 @@ void init_wp_pool();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
-  static char *line_read = NULL;
+  static char *line_read = NULL;//line_read：这是一个指向字符串的指针，用于存储用户输入的行
 
   if (line_read) {
     free(line_read);
     line_read = NULL;
   }
 
-  line_read = readline("(nemu) ");
-
+  line_read = readline("(nemu) ");//用于处理用户输入，支持自动补全、历史记录等
+//readline 函数会读取用户输入的一行，并返回一个指向动态分配的字符串的指针
+//如果用户直接按回车键（没有输入任何内容），line_read 可能为 NULL。
   if (line_read && *line_read) {
-    add_history(line_read);
+    add_history(line_read);//将输入的行添加到历史记录
   }
 
   return line_read;
@@ -115,7 +116,7 @@ static int cmd_p(char *args){
   }
   return 0;
 }
-static int cmd_ext(char *args){
+static int cmd_ext(char *args){//const 修饰的是 char，表示指针所指向的内容（字符）是不能被修改的。
   const char *input_file_path = "/home/huang/ysyx-workbench/nemu/tools/gen-expr/input";
   FILE *input_file = fopen(input_file_path,"r");
   if(input_file == NULL)
@@ -123,16 +124,16 @@ static int cmd_ext(char *args){
     perror("Failed to open input file");
     return -1;
   }
-  char line[4096];
+  char line[4096];//定义了一个字符数组 line用于存储从文件中读取的每一行
   int all_test = 0,past_test = 0;
-  while(fgets(line,sizeof(line),input_file)){
+  while(fgets(line,sizeof(line),input_file)){//fgets 函数逐行读取文件内容，每次读取一行存储到 line 中
     char *expected_result_str = strtok(line," ");
     char *expr_str = strtok(NULL,"\n");
     if (expected_result_str == NULL || expr_str == NULL) {
       fprintf(stderr, "Invalid test case format: %s", line);
       continue;
-    }
-    int expected_result = atoi(expected_result_str);
+    }//stderr 是C语言标准库中的一个宏，表示标准错误流
+    int expected_result = atoi(expected_result_str);//使用 atoi 函数将预期结果从字符串转换为整数。
     bool success = false;
     word_t result = expr(expr_str,&success);
     all_test ++;
@@ -178,7 +179,7 @@ static int cmd_d(char *args)
 static struct {
   const char *name;
   const char *description;
-  int (*handler) (char *);
+  int (*handler) (char *);//指向处理函数的指针。这个函数接受一个字符串参数 char *，并返回一个整数。
 } cmd_table [] = {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
@@ -194,7 +195,7 @@ static struct {
   { "d","deletepoint",cmd_d},
 };
 
-#define NR_CMD ARRLEN(cmd_table)
+#define NR_CMD ARRLEN(cmd_table)//ARRLEN 是一个宏，用于计算数组的长度
 
 static int cmd_help(char *args) {
   /* extract the first argument */
@@ -228,10 +229,10 @@ void sdb_mainloop() {
     cmd_c(NULL);
     return;
   }
-
+//如果程序处于批处理模式，则调用 cmd_c(NULL) 函数并退出主循环。不是与用户交互
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
-
+//rl_gets()会返回一个指向字符串的指针,如果读取失败（例如输入流结束），它会返回NULL
     /* extract the first token as the command */
     char *cmd = strtok(str, " ");
     if (cmd == NULL) { continue; }
@@ -239,7 +240,7 @@ void sdb_mainloop() {
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;
+    char *args = cmd + strlen(cmd) + 1;//命令行参数 
     if (args >= str_end) {
       args = NULL;
     }

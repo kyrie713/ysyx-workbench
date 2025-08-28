@@ -22,7 +22,7 @@ static IOMap maps[NR_MAP] = {};
 static int nr_map = 0;
 
 static IOMap* fetch_mmio_map(paddr_t addr) {
-  int mapid = find_mapid_by_addr(maps, nr_map, addr);
+  int mapid = find_mapid_by_addr(maps, nr_map, addr);//maps为设备注册表maps[16]的地址
   return (mapid == -1 ? NULL : &maps[mapid]);
 }
 
@@ -36,10 +36,10 @@ static void report_mmio_overlap(const char *name1, paddr_t l1, paddr_t r1,
 void add_mmio_map(const char *name, paddr_t addr, void *space, uint32_t len, io_callback_t callback) {
   assert(nr_map < NR_MAP);
   paddr_t left = addr, right = addr + len - 1;
-  if (in_pmem(left) || in_pmem(right)) {
+  if (in_pmem(left) || in_pmem(right)) {//作用：检查映射的地址是否与物理内存区域重叠。in_pmem(left) 和 in_pmem(right) 检查地址是否位于物理内存中。
     report_mmio_overlap(name, left, right, "pmem", PMEM_LEFT, PMEM_RIGHT);
-  }
-  for (int i = 0; i < nr_map; i++) {
+  }//如果是重叠，则调用 report_mmio_overlap 函数报告冲突
+  for (int i = 0; i < nr_map; i++) {//遍历现有的所有映射，检查新添加的映射是否与已存在的映射有重叠
     if (left <= maps[i].high && right >= maps[i].low) {
       report_mmio_overlap(name, left, right, maps[i].name, maps[i].low, maps[i].high);
     }

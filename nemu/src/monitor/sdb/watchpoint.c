@@ -25,10 +25,17 @@ typedef struct watchpoint {
   word_t old_value;
   char expr[100];  
 } WP;
-
+#ifndef CONFIG_WATCHPOINT
+void init_wp_pool() {}
+void set_wp(char *arg, word_t value) {}
+void delete_wp(int n) {}
+void display_wp() {}
+void scan_wp() {}
+#endif
+#ifdef CONFIG_WATCHPOINT
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
-#ifdef CONFIG_WATCHPOINT
+
 void init_wp_pool() {
   int i;
   for (i = 0; i < NR_WP; i ++) {

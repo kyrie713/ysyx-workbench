@@ -49,3 +49,8 @@ void init_serial() {
 #endif
 
 }
+/*putchar('A');   // 写到串口*/
+/*CPU store 指令 → 串口寄存器 (MMIO地址)↓
+NEMU 调用 serial_io_handler()↓       
+serial_io_handler 发现是写 offset=0↓       
+serial_putc() → 实际打印到 stderr*/

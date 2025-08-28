@@ -48,6 +48,13 @@ sim: $(BIN)
 	@echo "Running simulation with git commit..."
 	./build/top +trace  
 
+run: $(BIN)
+	@if [ -z "$(IMAGE)" ];then \
+		echo "Error: 请通过 'IMAGE=xxx.bin' 指定镜像文件路径new"; \
+		exit 1;\
+	fi
+	./$(BIN) $(IMAGE) +trace
+	
 clean:
 	rm -rf $(BUILD_DIR) wave.vcd
 

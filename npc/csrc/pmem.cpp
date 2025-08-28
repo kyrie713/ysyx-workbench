@@ -29,39 +29,60 @@ static uint32_t memory[MEM_SIZE / 4]; // 32位存储器
 //     printf("Memory initialized with single instruction: 0x%08x\n", memory[1]);
 // }
 
-extern "C" void init_memory(const char* path){
+// extern "C" void init_memory(const char* path){
+//     for (int i = 0; i < MEM_SIZE / 4; i++) {
+//         memory[i] = 0;
+//     }   
+//     FILE* fp = fopen(path,"rb");
+//     if(!fp) {
+//         perror("Failed to open hex file");
+//         exit(1);
+//     }
+//     uint32_t addr =0;
+//     char line[9];
+//     while(fscanf(fp,"%8s",line) == 1) {
+//         if(line[0] == '\0') continue;
+//         //转换十六进制字符串为uint32_t
+//         memory[addr ++ ] = (uint32_t)strtoul(line,NULL,16);
+//         // 检查地址边界
+//         if (addr >= MEM_SIZE/4) {
+//             fprintf(stderr, "Warning: Memory capacity exceeded at line %d\n", addr);
+//             break;
+//         }
+    
+//     }
+//     fclose(fp);
+//     printf("Memory initialized with single instruction: 0x%08x\n", memory[0]);//调试
+//     printf("Memory initialized with single instruction: 0x%08x\n", memory[1]);  //调试  
+//     printf("Loaded %d instructions from %s\n", addr, path); 
+    
+// }
+extern "C" void init_memory(const char* path) {
     for (int i = 0; i < MEM_SIZE / 4; i++) {
         memory[i] = 0;
-    }   
-    FILE* fp = fopen(path,"r");
-    if(!fp) {
-        perror("Failed to open hex file");
+    } 
+    FILE* fp = fopen(path, "rb");  // 二进制模式
+    if (!fp) {
+        perror("Failed to open file");
         exit(1);
     }
-    uint32_t addr =0;
-    char line[9];
-    while(fscanf(fp,"%8s",line) == 1) {
-        if(line[0] == '\0') continue;
-        //转换十六进制字符串为uint32_t
-        memory[addr ++ ] = (uint32_t)strtoul(line,NULL,16);
-        // 检查地址边界
-        if (addr >= MEM_SIZE/4) {
-            fprintf(stderr, "Warning: Memory capacity exceeded at line %d\n", addr);
-            break;
-        }        
-    }
+    size_t bytes_read = fread(memory, 1, MEM_SIZE, fp);  // 读取字节流
     fclose(fp);
-    printf("Loaded %d instructions from %s\n", addr, path); 
-    
+    //printf("Loaded %zu bytes from %s\n", bytes_read, path);
+    //printf("First instruction: 0x%08x\n", memory[0]);  // 调试
 }
 // 存储器读取函数
 extern "C" int pmem_read(int raddr) {
-    if (raddr >= MEM_BASE) {
-        raddr = raddr - MEM_BASE;
+    if (raddr == 0x80000000) {
+        printf("First instruction: 0x%08x\n", memory[0]);
     }
+    //打印的信息仅用于调试
+    // printf("[pmem_read] 传入的原始地址: 0x%08x\n", raddr);
+    raddr = raddr - MEM_BASE;
+    // printf("[pmem_read] 减去 MEM_BASE(0x%08x) 后的偏移量: 0x%08x\n", MEM_BASE, raddr);
     // 添加边界检查
     if (raddr < 0 || raddr >= MEM_SIZE) {
-        printf("ERROR: pmem_read out of bounds (0x%08x)\n", raddr);
+        //printf("ERROR: pmem_read out of bounds (0x%08x)\n", raddr);
         return 0;
     }
     // if(raddr == 48)
@@ -77,10 +98,7 @@ extern "C" int pmem_read(int raddr) {
 // 增强的存储器写入函数
 extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     uint8_t wmask = wmask_int & 0xF;
-    if(waddr > MEM_BASE)
-    {
-        waddr = waddr - MEM_BASE;
-    }
+    waddr = waddr - MEM_BASE;
     uint32_t aligned_addr = waddr & ~0x3;//将地址的最低2位强制设为0，实现向下取整到最近的4字节边界。
     uint32_t index = aligned_addr >> 2;
     // printf("C++ pmem_write called: waddr=0x%08x, wdata=0x%08x, wmask_int=0x%08x, wmask=0x%x\n", 
