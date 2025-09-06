@@ -24,8 +24,8 @@ enum { NEMU_RUNNING, NEMU_STOP, NEMU_END, NEMU_ABORT, NEMU_QUIT };
 
 typedef struct {
   int state;
-  vaddr_t halt_pc;
-  uint32_t halt_ret;
+  vaddr_t halt_pc;//模拟器暂停时的程序计数器（PC）值
+  uint32_t halt_ret;//模拟器暂停时的返回值
 } NEMUState;
 
 extern NEMUState nemu_state;

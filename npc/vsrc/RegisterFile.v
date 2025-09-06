@@ -23,6 +23,7 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   output reg [DATA_WIDTH-1:0] a4,
   output reg [DATA_WIDTH-1:0] a5  
 );
+  import "DPI-C" function void set_gpr_ptr(input logic [31:0] a[]);
     // 寄存器定义（RISC-V ABI名称）
     localparam ZERO = 0;
     localparam RA   = 1;
@@ -61,4 +62,7 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
     assign a4   = rf[A4];
     assign a5   = rf[A5];
 
+  initial begin 
+    set_gpr_ptr(rf);
+  end
 endmodule

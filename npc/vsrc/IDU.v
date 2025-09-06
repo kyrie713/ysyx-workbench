@@ -56,8 +56,8 @@ module IDU(
     r1 = inst[19:15];
     r2 = inst[24:20];
     rd = inst[11:7];
-    $display("inst: %b", inst);
-    $display("opcode: %b", opcode);
+    // $display("inst: %b", inst);
+    // $display("opcode: %b", opcode);
     case (opcode)
         //R_type指令 (add)
         7'b0110011:begin 

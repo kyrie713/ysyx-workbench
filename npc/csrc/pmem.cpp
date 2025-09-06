@@ -73,9 +73,9 @@ extern "C" void init_memory(const char* path) {
 }
 // 存储器读取函数
 extern "C" int pmem_read(int raddr) {
-    if (raddr == 0x80000000) {
-        printf("First instruction: 0x%08x\n", memory[0]);
-    }
+    // if (raddr == 0x80000000) {
+    //     printf("First instruction: 0x%08x\n", memory[0]);
+    // }
     //打印的信息仅用于调试
     // printf("[pmem_read] 传入的原始地址: 0x%08x\n", raddr);
     raddr = raddr - MEM_BASE;
@@ -119,6 +119,6 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     if (wmask & 0x8) mem_byte[3] = (wdata >> 24) & 0xFF;
 
     // 调试输出
-    printf("MEM WRITE: addr=0x%08x data=0x%08x mask=0x%x\n", 
-           waddr, wdata, wmask);
+    // printf("MEM WRITE: addr=0x%08x data=0x%08x mask=0x%x\n", 
+    //        waddr, wdata, wmask);
 }

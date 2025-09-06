@@ -16,9 +16,21 @@
 #include <isa.h>
 #include <cpu/difftest.h>
 #include "../local-include/reg.h"
-
+extern CPU_state cpu;
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  return false;
+  for(int i = 0;i<32;i++)
+  {
+    if(cpu.gpr[i] !=ref_r->gpr[i]){
+      printf("Mismatch at PC = 0x%08x: reg[%d] DUT=0x%08x, REF=0x%08x\n",
+            pc, i, cpu.gpr[i], ref_r->gpr[i]);
+      return false;
+    }
+  }
+  if(cpu.pc != ref_r->pc){
+    printf("Mismatch: PC DUT=0x%08x REF=0x%08x\n",cpu.pc,ref_r->pc);
+    return false;
+  }
+  return true;
 }
 
 void isa_difftest_attach() {

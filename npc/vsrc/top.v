@@ -3,6 +3,12 @@ module top(
     input rst,
     output [31:0] PC,
     output [31:0] inst,
+    output logic do_memread,
+    output logic MemWEn,
+    output logic [31:0] mem_addr,
+    output logic [31:0] MemWriteData,
+    output logic [31:0] MemReadData,
+
     // 新增：调试寄存器输出
     output [31:0] debug_zero,
     output [31:0] debug_ra,
@@ -23,9 +29,9 @@ module top(
     wire [31:0] ALU_OUT;
     wire [31:0] R1_data;
     wire [31:0] R2_data;
-    wire [31:0] MemReadData;
+    //wire [31:0] MemReadData;
     wire [31:0] RegWriteData;
-    wire [31:0] MemWriteData;
+    //wire [31:0] MemWriteData;
     wire [31:0] MemReadDataoneword;
     wire Reg_WE;
     wire I_jalr;
@@ -39,7 +45,7 @@ module top(
     wire S_TYPE;
     wire U_TYPE;
     wire I_TYPE;
-    wire MemWEn;
+    //wire MemWEn;
     wire B_TYPE;
     wire J_TYPE;
     wire U_lui;
@@ -54,13 +60,14 @@ module top(
     // 指令存储器接口
     import "DPI-C" function int pmem_read(input int raddr);
     assign inst = pmem_read(PC);//问题就是出现在这里，先读出来的值是地址为0的内存块的值
-    always @(*) begin
-        $display("PC :0x%08x",PC);
-    end
-    // 数据存储器接口
-    wire [31:0] mem_addr = ALU_OUT;
-    assign MemReadData = pmem_read(mem_addr);
     // always @(*) begin
+    //     $display("PC :0x%08x",PC);
+    // end
+    // 数据存储器接口
+    //reg [31:0] MemReadData;
+    assign mem_addr = ALU_OUT;
+    assign do_memread = l_lw | l_lbu;
+    assign MemReadData = do_memread ? pmem_read(mem_addr) : 32'b0;
     //     $display("0x%08x\n",MemReadData);
     //     $display("ALU_OUT = 0x%08x\n",ALU_OUT);
     // end
@@ -71,8 +78,8 @@ module top(
     // 存储器写操作（时钟同步）
     always @(posedge clk) begin
         if (MemWEn) begin
-            $display("Verilog: Writing to addr=0x%08x, data=0x%08x, mask=0x%x", 
-                mem_addr, MemWriteData, wmask);
+            // $display("Verilog: Writing to addr=0x%08x, data=0x%08x, mask=0x%x", 
+            //     mem_addr, MemWriteData, wmask);
             pmem_write(mem_addr, MemWriteData,  {28'b0, wmask});
         end
     end

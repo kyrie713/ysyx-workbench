@@ -29,8 +29,8 @@ CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*
 
 
 INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
-LDFLAGS += -lSDL2 -lSDL2_image
+CXXFLAGS += $(INCFLAGS) -I /home/huang/ysyx-workbench/nemu/tools/capstone/repo/include -DTOP_NAME="\"V$(TOPNAME)\""
+LDFLAGS += -L /home/huang/ysyx-workbench/nemu/tools/capstone/repo/ -lcapstone -lSDL2 -lSDL2_image
 
 
 $(BIN): $(VSRCS) $(CSRCS) #$(NVBOARD_ARCHIVE)
@@ -49,10 +49,10 @@ sim: $(BIN)
 	./build/top +trace  
 
 run: $(BIN)
-	@if [ -z "$(IMAGE)" ];then \
-		echo "Error: 请通过 'IMAGE=xxx.bin' 指定镜像文件路径new"; \
-		exit 1;\
-	fi
+# 	@if [ -z "$(IMAGE)" ];then \
+# 		echo "Error: 请通过 'IMAGE=xxx.bin' 指定镜像文件路径new"; \
+# 		exit 1;\
+# 	fi
 	./$(BIN) $(IMAGE) +trace
 	
 clean:
