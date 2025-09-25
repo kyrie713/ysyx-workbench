@@ -1,10 +1,23 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define MEM_SIZE (1024 * 1024) // 1MB存储器
+#include <sys/time.h>
+#include <cstring>
+#include <elf.h>
+#define MEM_SIZE (32 * 1024 * 1024) // 1MB存储器
 static uint32_t memory[MEM_SIZE / 4]; // 32位存储器
 #define MEM_BASE 0x80000000
+#define RTC_ADDR 0xa0000048
+#define SERIAL_PORT 0xa0000038
+static uint64_t nowtime = 0;
+uint64_t get_system_time_us() {
+    struct timeval tv;
+    if (gettimeofday(&tv, NULL) != 0) {
+        perror("gettimeofday failed");
+        return 0;  
+    }
+    return (uint64_t)tv.tv_sec * 1000000ULL + tv.tv_usec;
+}
 // 从文件加载程序到存储器
 
 // 初始化存储器
@@ -73,6 +86,13 @@ extern "C" void init_memory(const char* path) {
 }
 // 存储器读取函数
 extern "C" int pmem_read(int raddr) {
+    // ----------MMIO-----------
+    if(raddr == RTC_ADDR){
+        nowtime = get_system_time_us();
+        return (uint32_t) nowtime;
+    }else if(raddr == RTC_ADDR + 4){
+        return (uint32_t) (nowtime >> 32);
+    }
     // if (raddr == 0x80000000) {
     //     printf("First instruction: 0x%08x\n", memory[0]);
     // }
@@ -97,6 +117,14 @@ extern "C" int pmem_read(int raddr) {
 
 // 增强的存储器写入函数
 extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
+        // ---------- MMIO 处理 ----------
+    if (waddr == SERIAL_PORT) {
+        char ch = (char)(wdata & 0xFF);
+        putchar(ch);   // 或者 printf("%c", ch);
+        fflush(stdout);
+        //printf("[DEBUG] SERIAL WRITE: 0x%02x -> '%c'\n", wdata & 0xFF, ch);
+        return;
+    }
     uint8_t wmask = wmask_int & 0xF;
     waddr = waddr - MEM_BASE;
     uint32_t aligned_addr = waddr & ~0x3;//将地址的最低2位强制设为0，实现向下取整到最近的4字节边界。

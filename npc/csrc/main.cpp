@@ -4,7 +4,7 @@
 //#include <nvboard.h> 
 #include "Vtop.h"  
 #include "verilated.h"
-#include "verilated_vcd_c.h" // 可选，如果要导出vcd则需要加上
+// #include "verilated_vcd_c.h" // 可选，如果要导出vcd则需要加上
 
 static FILE *itrace_fp = NULL;
 // 声明外部存储器函数
@@ -48,9 +48,9 @@ void scan_registers(){
         printf("%s\t\t0x%08x\n",regs[i],cpu_gpr[i]);
     }
 }
-void single_step(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
-    top->clk = 0;top->eval();contextp->timeInc(1);tfp->dump(contextp->time());
-    top->clk = 1;top->eval();contextp->timeInc(1);tfp->dump(contextp->time());
+void single_step(Vtop* top,VerilatedContext* contextp){//,VerilatedVcdC* tfp){
+    top->clk = 0;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
+    top->clk = 1;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
 } 
 
 void check_trap(Vtop* top) {
@@ -79,10 +79,10 @@ int main(int argc, char** argv, char** env) {
     contextp->commandArgs(argc, argv);
     Vtop* top = new Vtop{contextp};//创建一个Vtop实例，Vtop是你的顶层Verilog模块的C++表示。contextp是Verilator上下文对象，用于管理仿真。   
     
-    VerilatedVcdC* tfp = new VerilatedVcdC; //这是用于波形生成的对象
-    contextp->traceEverOn(true);
-    top->trace(tfp, 99); //这句代码和上面那句代码用于启用波形跟踪和连接波形对象。
-    tfp->open("wave.vcd"); //这是用于打开波形文件的代码
+    // VerilatedVcdC* tfp = new VerilatedVcdC; //这是用于波形生成的对象
+    // contextp->traceEverOn(true);
+    // top->trace(tfp, 99); //这句代码和上面那句代码用于启用波形跟踪和连接波形对象。
+    // tfp->open("wave.vcd"); //这是用于打开波形文件的代码
 
 
     // reset
@@ -132,7 +132,7 @@ int main(int argc, char** argv, char** env) {
                 fflush(itrace_fp);   /* 强制把缓冲区刷到磁盘，先调试用 */
                 //printf("[itrace] write pc=0x%08x\n", top->PC);  /* 终端能看到就说明确实执行了 */
                 log_mem_access(top);
-                single_step(top,contextp,tfp);
+                single_step(top,contextp);//,tfp);
             }
             // printf("PC   = 0x%08x\n",top->PC);
             // printf("inst = 0x%08x\n",top->inst);
@@ -149,11 +149,11 @@ int main(int argc, char** argv, char** env) {
                 code[2] = (inst >> 16) & 0xff;
                 code[3] = (inst >> 24) & 0xff;
                 disassemble(disasm_output,sizeof(disasm_output),top->PC,code,4);
-                printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
+                //printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
                 fprintf(itrace_fp, "0x%08x: 0x%08x %s\n", top->PC, top->inst, disasm_output);
                 fflush(itrace_fp);
                 log_mem_access(top);
-                single_step(top,contextp,tfp);
+                single_step(top,contextp);//,tfp);
             }
             check_trap(top);
         }else if(strcmp(cmd_buf,"info r") == 0) {
@@ -178,7 +178,7 @@ int main(int argc, char** argv, char** env) {
     }
     fclose(itrace_fp);
     delete top;
-    tfp->close();//这是用于关闭波形文件的代码
+    //tfp->close();//这是用于关闭波形文件的代码
     delete contextp;
     return 0;
 }
