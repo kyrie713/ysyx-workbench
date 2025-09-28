@@ -10,10 +10,12 @@ module ALU(
     input I_jalr,
     input l_lbu,
     input l_lw,
+    input I_csrrw,
     input [31:0] rdata_1,
     input [31:0] rdata_2,
     input [31:0] imm,
     input [31:0] pc,
+    output reg [31:0] csr_wdata,
     output reg [31:0] ALU_OUT
 );
     reg [31:0] A;
@@ -23,6 +25,12 @@ module ALU(
         A = 0;
         B = 0;
         ALU_OUT = 0;
+        if(I_csrrw) begin
+            csr_wdata = rdata_1;
+        end
+        else begin 
+            csr_wdata = 32'b0;
+        end
 
         if (R_TYPE | I_TYPE | S_TYPE) begin
             A = rdata_1;

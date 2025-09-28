@@ -25,6 +25,10 @@ module top(
     output [31:0] debug_a5
 );
 // 定义内部信号
+    wire        I_csrrw;
+    wire [11:0] csr_addr;
+    wire [31:0] csr_wdata;
+    wire [31:0] csr_rdata;
     wire [31:0] PC_plus_4;
     wire [31:0] ALU_OUT;
     wire [31:0] R1_data;
@@ -122,6 +126,8 @@ module top(
         .S_sw(S_sw),
         .S_sb(S_sb),
         .I_ebreak(I_ebreak),
+        .I_csrrw(I_csrrw),
+        .csr_addr(csr_addr),
         .imm(imm),
         .r1(r1),
         .r2(r2),
@@ -142,6 +148,8 @@ module top(
         .I_TYPE_ARITH(I_TYPE_ARITH),
         .U_TYPE(U_TYPE),
         .J_TYPE(J_TYPE),
+        .I_csrrw(I_csrrw),
+        .CSR_RDATA(csr_rdata),
         .I_TYPE(I_TYPE),
         .RegWriteData(RegWriteData),
         .MemWriteData(MemWriteData),
@@ -187,10 +195,21 @@ module top(
         .I_jalr(I_jalr),
         .l_lbu(l_lbu),
         .l_lw(l_lw),
+        .I_csrrw(I_csrrw),
         .rdata_1(R1_data),
         .rdata_2(R2_data),
         .imm(imm),
         .pc(PC),
+        .csr_wdata(csr_wdata),
         .ALU_OUT(ALU_OUT)
+    );
+    CSR csr(
+        .clk(clk),
+        .rst(rst),
+        .I_csrrw(I_csrrw),
+        .csr_addr(csr_addr), 
+        .csr_wdata(csr_wdata),         
+        .csr_rdata(csr_rdata) 
+
     );
 endmodule

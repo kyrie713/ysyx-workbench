@@ -13,6 +13,8 @@ module LSU(
     input I_TYPE,
     input U_TYPE,
     input J_TYPE,
+    input I_csrrw,
+    input [31:0] CSR_RDATA,
     output  reg [31:0] RegWriteData,
     output  reg [31:0] MemWriteData,
     output  reg [31:0] MemReadDataoneword,
@@ -20,17 +22,19 @@ module LSU(
     output  reg [3:0] wmask
 );
   always @(*) begin
-    Reg_WE = R_TYPE | I_TYPE | U_TYPE | J_TYPE;
+    Reg_WE = R_TYPE | I_TYPE | U_TYPE | J_TYPE | I_csrrw;
     
     RegWriteData = 32'b0;
     MemWriteData = 32'b0;
     MemReadDataoneword = 32'b0;
     wmask = 4'b0000;
     // 寄存器写回数据选择
-    if(l_lw) begin 
-        RegWriteData = MemReadData;
+    if (I_csrrw) begin
+        RegWriteData = CSR_RDATA;
     end else if (R_TYPE|I_TYPE_ARITH|U_TYPE) begin
         RegWriteData = ALU_OUT;
+    end else if(l_lw) begin 
+        RegWriteData = MemReadData;
     end else if(I_jalr) begin
         RegWriteData = PC_plus_4;
     end else if(l_lbu) begin

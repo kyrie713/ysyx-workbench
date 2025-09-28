@@ -13,7 +13,6 @@ extern "C" void init_memory(const char* path);
 
 void disassemble(char *str,int size,uint64_t pc,uint8_t *code,int nbyte);
 void init_disasm();
-
 void log_mem_access(Vtop* top) {
     if (top->do_memread) {
         fprintf(itrace_fp, "[MEM-READ ] addr=0x%08x data=0x%08x\n",

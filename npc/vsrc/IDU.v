@@ -18,6 +18,8 @@ module IDU(
   output reg S_sw,
   output reg S_sb,
   output reg I_ebreak,
+  output reg I_csrrw,
+  output reg [11:0]csr_addr,
   output reg [31:0] imm,
   output reg [4:0]r1,
   output reg [4:0]r2,
@@ -32,7 +34,6 @@ module IDU(
   wire [31:0] immB = {{20{inst[31]}},inst[7],inst[30:25],inst[11:8],1'b0};
   wire [31:0] immU = {inst[31:12],12'b000000000000};
   wire [31:0] immJ = {{12{inst[31]}},inst[19:12],inst[20],inst[30:21],1'b0};
-  
   always @(*) begin
     R_TYPE = 0;
     I_TYPE_ARITH = 0;
@@ -52,7 +53,9 @@ module IDU(
     imm = 0;
     I_TYPE = 0;  
     U_TYPE = 0;
-
+    I_csrrw = 0;
+    csr_addr = inst[31:20];
+    // $display("CSR read addr = %h", csr_addr);
     r1 = inst[19:15];
     r2 = inst[24:20];
     rd = inst[11:7];
@@ -104,7 +107,9 @@ module IDU(
             U_lui = 1;//LUI
         end
         7'b1110011:begin
-            if(inst[31:7] == 25'b0000000000010000000000000) begin
+            if(funct3 == 3'b001) begin 
+                I_csrrw = 1;
+            end else if(inst[31:7] == 25'b0000000000010000000000000) begin
                 I_ebreak = 1;
             end
         end
@@ -115,14 +120,18 @@ module IDU(
     //$display("addi_TYPE: %b", I_add);//调试
     I_TYPE = I_TYPE_ARITH | L_TYPE_LOAD | I_jalr;
     U_TYPE = U_lui;
-
+    // if(I_csrrw == 1) begin
+    //     $display("IDU: inst=%h opcode=%b I_csrrw=%b csr_addr=%h", inst, opcode, I_csrrw, csr_addr);
+    // end
     case(1'b1)
       I_TYPE: imm = immI;
       S_TYPE: imm = immS;
       B_TYPE: imm = immB;
       U_TYPE: imm = immU;
       J_TYPE: imm = immJ;
-      default: imm = 0;
+      default: begin
+            imm = 0;
+      end
     endcase
 
   end
