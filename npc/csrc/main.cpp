@@ -2,29 +2,62 @@
 #include <stdlib.h>
 #include <assert.h>
 //#include <nvboard.h> 
-#include "Vtop.h"  
+#include "VysyxSoCFull.h"  
 #include "verilated.h"
-// #include "verilated_vcd_c.h" // 可选，如果要导出vcd则需要加上
-
+ //#include "verilated_vcd_c.h" // 可选，如果要导出vcd则需要加上
+static uint64_t count = 0;//计算周期数用的，可删
 static FILE *itrace_fp = NULL;
+
+#define FLASH_SIZE (16 * 1024 * 1024) // 16MB
+#define FLASH_BASE 0x30000000
+static uint8_t flash_mem[FLASH_SIZE] __attribute__((aligned(4096))) = {0};
+
 // 声明外部存储器函数
 extern "C" int pmem_read(int raddr);
 extern "C" void init_memory(const char* path);
 
+// define  FLASH_SIZE (16 * 1024 * 1024)
+// define  FLASH_BASE 0x30000000
+extern "C" void flash_init(const char *bin_path) {
+    FILE *fp = fopen(bin_path, "rb");
+    if (fp == NULL) {
+        perror("Cannot open flash image");
+        exit(1);
+    }
+
+    size_t size = fread(flash_mem, 1,FLASH_SIZE, fp);
+    fclose(fp);
+
+    printf("[flash_init] Loaded %zu bytes into flash from %s\n", size, bin_path);
+    assert(size > 0);
+}
+extern "C" void flash_read(int32_t addr, int32_t *data) {
+    // 小端方式组装 4 字节
+    uint32_t val = 0;
+    val |= (uint32_t)flash_mem[addr + 0];
+    val |= (uint32_t)flash_mem[addr + 1] << 8;
+    val |= (uint32_t)flash_mem[addr + 2] << 16;
+    val |= (uint32_t)flash_mem[addr + 3] << 24;
+
+    *data = val;
+    assert(addr + 4 <= FLASH_SIZE);
+
+    //rintf("[flash_read] addr = 0x%08x, data = 0x%08x\n", addr, *data);
+}
 void disassemble(char *str,int size,uint64_t pc,uint8_t *code,int nbyte);
 void init_disasm();
-void log_mem_access(Vtop* top) {
-    if (top->do_memread) {
-        fprintf(itrace_fp, "[MEM-READ ] addr=0x%08x data=0x%08x\n",
-                top->mem_addr, top->MemReadData);
-        fflush(itrace_fp);
-    }
-    if (top->MemWEn) {
-        fprintf(itrace_fp, "[MEM-WRITE] addr=0x%08x data=0x%08x\n",
-                top->mem_addr, top->MemReadData);
-        fflush(itrace_fp);
-    }
-}
+// void log_mem_access(Vtop* top) {
+//     if (top->do_memread) {
+//         fprintf(itrace_fp, "[MEM-READ ] addr=0x%08x data=0x%08x\n",
+//                 top->mem_addr, top->MemReadData);
+//         fflush(itrace_fp);
+//     }
+//     if (top->MemWEn) {
+//         fprintf(itrace_fp, "[MEM-WRITE] addr=0x%08x data=0x%08x\n",
+//                 top->mem_addr, top->MemReadData);
+//         fflush(itrace_fp);
+//     }
+// }
 // 全局变量控制仿真结束
 bool simulation_finished = false;
 extern "C" void notify_ebreak(){
@@ -40,43 +73,49 @@ const char *regs[] = {
 extern "C" void set_gpr_ptr(uint32_t *a){
     cpu_gpr = a;
 }
+//extern "C" void flash_read(int32_t addr, int32_t *data) { assert(0); }
 void scan_registers(){
     if(!cpu_gpr) return;
     for(int i =0;i<32;i++)
     {
         printf("%s\t\t0x%08x\n",regs[i],cpu_gpr[i]);
     }
+    //printf("a0\t\t0x%08x\n",top->debug_a0);
 }
-void single_step(Vtop* top,VerilatedContext* contextp){//,VerilatedVcdC* tfp){
-    top->clk = 0;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
-    top->clk = 1;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
+void single_step(VysyxSoCFull* top,VerilatedContext* contextp){//,VerilatedVcdC* tfp){
+    top->clock = 0;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
+    top->clock = 1;top->eval();contextp->timeInc(1);//tfp->dump(contextp->time());
+    count++;
 } 
 
-void check_trap(Vtop* top) {
+void check_trap(VysyxSoCFull* top) {
     if (simulation_finished) {
-        uint32_t a0 = top->debug_a0;
-        uint32_t pc = top->PC;
-        if (a0 == 0) {
+        //uint32_t a0 = top->debug_a0;
+        //uint32_t pc = top->PC;
+        //if (a0 == 0) {
         // 绿色 GOOD
-            printf("\033[1;32mHIT GOOD TRAP\033[0m at pc = 0x%08x\n", pc);
-        } else {
+            printf("\033[1;32mHIT GOOD TRAP\033");
+        //} else {[0m at pc = 0x%08x\n", pc);
         // 红色 BAD
-            printf("\033[1;31mHIT BAD TRAP\033[0m  at pc = 0x%08x, code = %u\n", pc, a0);
-        }
+        //    printf("\033[1;31mHIT BAD TRAP\033[0m  at pc = 0x%08x, code = %u\n", pc, a0);
+        //}
     }
 }
 char cmd_buf[128];
 int main(int argc, char** argv, char** env) {
     const char* image_path = argv[1];
-    init_memory(image_path);
-
+    flash_init(image_path);
+    printf("argc = %d\n", argc);
+    for (int i = 0; i < argc; i++) {
+        printf("argv[%d] = %s\n", i, argv[i]);
+    }
     init_disasm();
     itrace_fp = fopen("/home/huang/ysyx-workbench/am-kernels/tests/cpu-tests/build/npc-log.txt", "w");
     printf("itrace_fp = %p\n", (void *)itrace_fp); 
     assert(itrace_fp);
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
-    Vtop* top = new Vtop{contextp};//创建一个Vtop实例，Vtop是你的顶层Verilog模块的C++表示。contextp是Verilator上下文对象，用于管理仿真。   
+    VysyxSoCFull* top = new VysyxSoCFull{contextp};//创建一个Vtop实例，Vtop是你的顶层Verilog模块的C++表示。contextp是Verilator上下文对象，用于管理仿真。   
     
     // VerilatedVcdC* tfp = new VerilatedVcdC; //这是用于波形生成的对象
     // contextp->traceEverOn(true);
@@ -85,15 +124,23 @@ int main(int argc, char** argv, char** env) {
 
 
     // reset
-    top->rst  = 1; 
-    top->clk = 0;
+    top->reset  = 1;
+    top->eval(); 
+    top->clock = 0;
     int cycle_count = 0;
-    for (int i = 0; i < 4; i++) {
-        top->clk = !top->clk;
+
+
+// 给复位至少 5~10 个完整周期
+    for (int i = 0; i < 10; i++) {
+        top->clock = 1;
+        top->eval();
+        contextp->timeInc(1);
+
+        top->clock = 0;
         top->eval();
         contextp->timeInc(1);
     }
-    top->rst = 0;
+    top->reset = 0;
 
     while(!contextp->gotFinish()){ 
         printf("(npc) ");
@@ -118,19 +165,19 @@ int main(int argc, char** argv, char** env) {
             {
 
                 
-                char disasm_output [128];
-                uint32_t inst = top->inst;
-                uint8_t code[4];
-                code[0] = inst & 0xff;
-                code[1] = (inst >> 8) & 0xff;
-                code[2] = (inst >> 16) & 0xff;
-                code[3] = (inst >> 24) & 0xff;
-                disassemble(disasm_output,sizeof(disasm_output),top->PC,code,4);
-                printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
-                fprintf(itrace_fp, "0x%08x: 0x%08x %s\n", top->PC, top->inst, disasm_output);
-                fflush(itrace_fp);   /* 强制把缓冲区刷到磁盘，先调试用 */
+                // char disasm_output [128];
+                // uint32_t inst = top->inst;
+                // uint8_t code[4];
+                // code[0] = inst & 0xff;
+                // code[1] = (inst >> 8) & 0xff;
+                // code[2] = (inst >> 16) & 0xff;
+                // code[3] = (inst >> 24) & 0xff;
+                // disassemble(disasm_output,sizeof(disasm_output),top->PC,code,4);
+                // printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
+                // fprintf(itrace_fp, "0x%08x: 0x%08x %s\n", top->PC, top->inst, disasm_output);
+                // fflush(itrace_fp);   /* 强制把缓冲区刷到磁盘，先调试用 */
                 //printf("[itrace] write pc=0x%08x\n", top->PC);  /* 终端能看到就说明确实执行了 */
-                log_mem_access(top);
+                //log_mem_access(top);
                 single_step(top,contextp);//,tfp);
             }
             // printf("PC   = 0x%08x\n",top->PC);
@@ -140,23 +187,23 @@ int main(int argc, char** argv, char** env) {
         {
             while(!simulation_finished){
 
-                char disasm_output [128];
-                uint32_t inst = top->inst;
-                uint8_t code[4];
-                code[0] = inst & 0xff;
-                code[1] = (inst >> 8) & 0xff;
-                code[2] = (inst >> 16) & 0xff;
-                code[3] = (inst >> 24) & 0xff;
-                disassemble(disasm_output,sizeof(disasm_output),top->PC,code,4);
-                //printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
-                fprintf(itrace_fp, "0x%08x: 0x%08x %s\n", top->PC, top->inst, disasm_output);
-                fflush(itrace_fp);
-                log_mem_access(top);
+                // char disasm_output [128];
+                // uint32_t inst = top->inst;
+                // uint8_t code[4];
+                // code[0] = inst & 0xff;
+                // code[1] = (inst >> 8) & 0xff;
+                // code[2] = (inst >> 16) & 0xff;
+                // code[3] = (inst >> 24) & 0xff;
+                // disassemble(disasm_output,sizeof(disasm_output),top->PC,code,4);
+                // printf("0x%08x: 0x%08x %s\n",top->PC,top->inst,disasm_output);
+                // fprintf(itrace_fp, "0x%08x: 0x%08x %s\n", top->PC, top->inst, disasm_output);
+                // fflush(itrace_fp);
+                //log_mem_access(top);
                 single_step(top,contextp);//,tfp);
             }
             check_trap(top);
         }else if(strcmp(cmd_buf,"info r") == 0) {
-            printf("PC = 0x%08x\n", top->PC);
+            //printf("PC = 0x%08x\n", top->PC);
             scan_registers();            
         }else if (strncmp(cmd_buf,"x",1)==0)
         {
@@ -176,6 +223,7 @@ int main(int argc, char** argv, char** env) {
         }
     }
     fclose(itrace_fp);
+    printf("Total cycles: %llu\n", (unsigned long long)count);//计算周期数用的，可删
     delete top;
     //tfp->close();//这是用于关闭波形文件的代码
     delete contextp;

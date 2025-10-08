@@ -1,4 +1,4 @@
-module CSR(
+module ysyx_25080202_CSR(
     input clk,
     input rst,
 
@@ -29,7 +29,7 @@ module CSR(
     end
 
     // ========= 时序逻辑：写 =========
-    always @(posedge clk or posedge rst) begin
+    always @(posedge clk) begin
         if (rst) begin
             mcycle <= 64'b0;
         end else begin

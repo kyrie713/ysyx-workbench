@@ -1,4 +1,4 @@
-module ALU(
+module ysyx_25080202_EXU(
     input R_TYPE,
     input I_TYPE,
     input S_TYPE,
@@ -56,7 +56,10 @@ module ALU(
         end
         // $display("A = 0x%08x\n",A);//debug
         // $display("B = 0x%08x\n",B);//debug
-        // $display("ALU_OUT = 0x%08x\n",ALU_OUT);//debug
+        //if(I_jalr) begin     
+          //  $display("ALU_OUT = 0x%08x\n",ALU_OUT);//debug
         // $display("I_TYPE = %d\n",I_TYPE);//debug
+        //end 
     end
+    
 endmodule

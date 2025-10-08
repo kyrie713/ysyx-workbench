@@ -1,4 +1,4 @@
-module IDU(
+module ysyx_25080202_IDU(
   input [31:0] inst,
   output reg R_TYPE,
   output reg I_TYPE_ARITH,
@@ -23,7 +23,8 @@ module IDU(
   output reg [31:0] imm,
   output reg [4:0]r1,
   output reg [4:0]r2,
-  output reg [4:0]rd
+  output reg [4:0]rd,
+  output reg [3:0]wmask
 ); 
   wire [6:0] opcode = inst[6:0];
   wire [2:0] funct3 = inst[14:12];
@@ -54,6 +55,7 @@ module IDU(
     I_TYPE = 0;  
     U_TYPE = 0;
     I_csrrw = 0;
+    wmask = 4'b0;
     csr_addr = inst[31:20];
     // $display("CSR read addr = %h", csr_addr);
     r1 = inst[19:15];
@@ -89,9 +91,11 @@ module IDU(
             MemWEn = 1;
             if(funct3 == 3'b010) begin
                 S_sw = 1;//SW
+                wmask = 4'b1111;
             end
             if(funct3 == 3'b000) begin 
                 S_sb = 1;//SB
+                wmask =4'b0001;
             end
         end
         7'b1100011:begin

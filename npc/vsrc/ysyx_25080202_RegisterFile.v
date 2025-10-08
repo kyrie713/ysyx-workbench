@@ -1,8 +1,8 @@
-module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
+module ysyx_25080202_RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   input clk,
   input [DATA_WIDTH-1:0] wdata,
   input [ADDR_WIDTH-1:0] waddr,
-  input wen,
+  input L_wen,
   input [ADDR_WIDTH-1:0] raddr_1,
   input [ADDR_WIDTH-1:0] raddr_2,
   output reg [DATA_WIDTH-1:0] rdata_1,
@@ -38,10 +38,14 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
     localparam A3   = 13;
     localparam A4   = 14;
     localparam A5   = 15;
-      
+    reg wen;
+  assign wen = L_wen;
   reg [DATA_WIDTH-1:0] rf [2**ADDR_WIDTH-1:0];
+
   always @(posedge clk) begin
     if (wen) rf[waddr] <= wdata;
+    //f (waddr == 5'd2) $display("[REG] x2(sp) <= 0x%08h", wdata);
+
   end
 
     assign rdata_1 = (raddr_1 == 0) ? 32'b0 : rf[raddr_1];
