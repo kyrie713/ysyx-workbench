@@ -109,10 +109,11 @@ int main(int argc, char** argv, char** env) {
     for (int i = 0; i < argc; i++) {
         printf("argv[%d] = %s\n", i, argv[i]);
     }
+   // printf("MAINARGS = %s\n",MAINARGS);
     init_disasm();
-    itrace_fp = fopen("/home/huang/ysyx-workbench/am-kernels/tests/cpu-tests/build/npc-log.txt", "w");
-    printf("itrace_fp = %p\n", (void *)itrace_fp); 
-    assert(itrace_fp);
+    //itrace_fp = fopen("/home/huang/ysyx-workbench/am-kernels/tests/cpu-tests/build/npc-log.txt", "w");
+    //printf("itrace_fp = %p\n", (void *)itrace_fp); 
+    //assert(itrace_fp);
     VerilatedContext* contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
     VysyxSoCFull* top = new VysyxSoCFull{contextp};//创建一个Vtop实例，Vtop是你的顶层Verilog模块的C++表示。contextp是Verilator上下文对象，用于管理仿真。   
@@ -222,7 +223,7 @@ int main(int argc, char** argv, char** env) {
             printf("Unknown command: %s\n", cmd_buf);
         }
     }
-    fclose(itrace_fp);
+    //fclose(itrace_fp);
     printf("Total cycles: %llu\n", (unsigned long long)count);//计算周期数用的，可删
     delete top;
     //tfp->close();//这是用于关闭波形文件的代码

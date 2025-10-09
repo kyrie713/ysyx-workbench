@@ -13,6 +13,7 @@ module ysyx_25080202_WBU(
     input R_add,
     input U_lui,
     input I_csrrw,
+    input I_csrrs,
     input [31:0] load_wdata,
     input lsu_busy,
     input lsu_valid,
@@ -22,7 +23,7 @@ module ysyx_25080202_WBU(
     output reg wbu_valid,
     output [31:0] next_pc,
     output [31:0] reg_wdata,
-    output reg [31:0] csr_wdata
+    output [31:0] csr_wdata
 );
 
     localparam IDLE = 2'b00;
@@ -31,9 +32,9 @@ module ysyx_25080202_WBU(
     reg [1:0] state;
     assign next_pc = (I_jalr) ? {ALU_OUT[31:1],1'b0} : PC+4; 
     assign reg_wdata = (I_jalr) ? PC + 4 : 
-                        (I_csrrw) ? CSR_RDATA:
+                        (I_csrrw | I_csrrs) ? CSR_RDATA:
                         (lsu_valid) ? load_wdata : ALU_OUT;
-                        
+    assign csr_wdata = i_csr_wdata;          
 
     always @(posedge clk) begin
         if (rst) begin
@@ -42,7 +43,7 @@ module ysyx_25080202_WBU(
             wbu_ready <= 1'b0;
             wbu_valid <= 1'b0;
             //reg_wdata <= 32'b0;
-            csr_wdata <= 32'b0;
+            //csr_wdata <= 32'b0;
         end else begin
             case (state)
                 IDLE: begin
@@ -77,7 +78,7 @@ module ysyx_25080202_WBU(
                         //next_pc <= {ALU_OUT[31:1],1'b0};
                         //reg_wdata <= PC + 4;
                     end else if(I_csrrw) begin
-                        csr_wdata <= ALU_OUT;
+                        //csr_wdata <= ALU_OUT;
                         //reg_wdata <=CSR_RDATA;
                         //next_pc <=PC + 4;
                     end

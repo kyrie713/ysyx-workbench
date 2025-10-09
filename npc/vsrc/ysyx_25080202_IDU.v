@@ -19,6 +19,7 @@ module ysyx_25080202_IDU(
   output reg S_sb,
   output reg I_ebreak,
   output reg I_csrrw,
+  output reg I_csrrs,
   output reg [11:0]csr_addr,
   output reg [31:0] imm,
   output reg [4:0]r1,
@@ -55,6 +56,7 @@ module ysyx_25080202_IDU(
     I_TYPE = 0;  
     U_TYPE = 0;
     I_csrrw = 0;
+    I_csrrs = 0;
     wmask = 4'b0;
     csr_addr = inst[31:20];
     // $display("CSR read addr = %h", csr_addr);
@@ -113,6 +115,8 @@ module ysyx_25080202_IDU(
         7'b1110011:begin
             if(funct3 == 3'b001) begin 
                 I_csrrw = 1;
+            end else if(funct3 == 3'b010) begin
+                I_csrrs = 1;
             end else if(inst[31:7] == 25'b0000000000010000000000000) begin
                 I_ebreak = 1;
             end

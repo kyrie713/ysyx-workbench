@@ -19,6 +19,7 @@ module ysyx_25080202(
     // 内部信号定义
     // ===============================
     wire        I_csrrw;
+    wire        I_csrrs;
     wire [11:0] csr_addr;
     wire [31:0] csr_wdata;
     wire [31:0] csr_rdata;
@@ -166,6 +167,7 @@ module ysyx_25080202(
         .S_sb(S_sb),
         .I_ebreak(I_ebreak),
         .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
         .csr_addr(csr_addr),
         .imm(imm),
         .r1(r1),
@@ -250,6 +252,7 @@ module ysyx_25080202(
         .l_lbu(l_lbu),
         .l_lw(l_lw),
         .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
         .rdata_1(R1_data),
         .rdata_2(R2_data),
         .imm(imm),
@@ -262,8 +265,9 @@ module ysyx_25080202(
         .clk(clock),
         .rst(reset),
         .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
         .csr_addr(csr_addr),
-        .csr_wdata(csr_wdata),
+        .csr_wdata(csr_wdata_out),
         .csr_rdata(csr_rdata)
     );
     ysyx_25080202_WBU wbu (
@@ -281,6 +285,7 @@ module ysyx_25080202(
         .R_add(R_add),
         .U_lui(U_lui),
         .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
         .load_wdata(load_wdata),
         .lsu_busy(lsu_working),
         .lsu_valid(lsu_valid),

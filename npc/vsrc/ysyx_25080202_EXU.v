@@ -11,6 +11,7 @@ module ysyx_25080202_EXU(
     input l_lbu,
     input l_lw,
     input I_csrrw,
+    input I_csrrs,
     input [31:0] rdata_1,
     input [31:0] rdata_2,
     input [31:0] imm,
@@ -25,7 +26,7 @@ module ysyx_25080202_EXU(
         A = 0;
         B = 0;
         ALU_OUT = 0;
-        if(I_csrrw) begin
+        if(I_csrrw |I_csrrs) begin
             csr_wdata = rdata_1;
         end
         else begin 
