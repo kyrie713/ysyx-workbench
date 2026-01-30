@@ -13,7 +13,8 @@ CFLAGS    += -I$(AM_HOME)/am/src/platform/nemu/include
 LDSCRIPTS += $(AM_HOME)/scripts/linker.ld
 LDFLAGS   += --defsym=_pmem_start=0x80000000 --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
-NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt -b
+NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt
+NEMUFLAGS += -e $(IMAGE).elf
 #CFLAGS: 这是一个变量，用于存储编译器的标志。
 #LDSCRIPTS：这是一个变量，用于存储链接脚本文件路径。
 #LDFLAGS: 这是一个变量，用于存储链接器的标志。--defsym：这是一个链接器选项，用于定义一个符号及其值.
@@ -37,6 +38,8 @@ image: image-dep
 run: insert-arg
 	$(MAKE) -C $(NEMU_HOME) ISA=$(ISA) run ARGS="$(NEMUFLAGS)" IMG=$(IMAGE).bin
 # -C：make的一个选项，表示切换到指定的目录后再执行后续的命令。
+#切换到 $(NEMU_HOME) 目录（通常是 NEMU 模拟器的源代码目录）。执行 run 目标，运行 NEMU 模拟器，模拟运行一个 RISC-V 程序。
+#向 make 进程传递必要的参数：ISA=$(ISA)：指定目标架构，例如 riscv32 或 riscv64。ARGS="$(NEMUFLAGS)"：传递一些额外的模拟器标志（如日志文件路径等）。IMG=$(IMAGE).bin：指定要运行的镜像文件。
 gdb: insert-arg
 	$(MAKE) -C $(NEMU_HOME) ISA=$(ISA) gdb ARGS="$(NEMUFLAGS)" IMG=$(IMAGE).bin
 

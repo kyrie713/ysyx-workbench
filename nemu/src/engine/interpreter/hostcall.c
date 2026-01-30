@@ -23,7 +23,7 @@ void set_nemu_state(int state, vaddr_t pc, int halt_ret) {
   nemu_state.state = state;
   nemu_state.halt_pc = pc;
   nemu_state.halt_ret = halt_ret;
-}
+}//halt_ret 传的是a0寄存器的值//state传的是 NEMU_END
 
 __attribute__((noinline))
 void invalid_inst(vaddr_t thispc) {

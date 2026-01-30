@@ -164,6 +164,8 @@ static int cmd_w(char *args)
   
   return 0;
 }
+
+
 static int cmd_d(char *args)
 {
   if(args == NULL)
@@ -172,10 +174,12 @@ static int cmd_d(char *args)
     return 0;
   }
   char *arg = strtok(NULL, " ");
-  int n = strtol(arg, NULL, 10);
+  int n = strtol(arg, NULL, 10);//strtol 把字符串转为整数
   delete_wp(n);
   return 0;
 }
+
+
 static struct {
   const char *name;
   const char *description;
@@ -199,7 +203,7 @@ static struct {
 
 static int cmd_help(char *args) {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
+  char *arg = strtok(NULL, " ");//strtok(NULL, " ") 会继续切分上一次的同一个字符串，返回下一个 token。
   int i;
 
   if (arg == NULL) {
@@ -234,16 +238,16 @@ void sdb_mainloop() {
     char *str_end = str + strlen(str);
 //rl_gets()会返回一个指向字符串的指针,如果读取失败（例如输入流结束），它会返回NULL
     /* extract the first token as the command */
-    char *cmd = strtok(str, " ");
+    char *cmd = strtok(str, " ");//会把第一个空格前的内容切出来作为命令名
     if (cmd == NULL) { continue; }
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;//命令行参数 
+    char *args = cmd + strlen(cmd) + 1;//命令行参数 +1让指针越过\0
     if (args >= str_end) {
       args = NULL;
-    }
+    }////如果命令后什么都没有,就把args设置为 NULL
 
 #ifdef CONFIG_DEVICE
     extern void sdl_clear_event_queue();
@@ -253,7 +257,7 @@ void sdb_mainloop() {
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }
+        if (cmd_table[i].handler(args) < 0) { return; }//如果命令处理函数告知“要退出”，那整个 sdb_mainloop() 也返回（退出调试器）
         break;
       }
     }

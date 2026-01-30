@@ -21,6 +21,12 @@
 typedef struct {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   vaddr_t pc;
+
+  // ===== CSR / 特权寄存器 =====
+  vaddr_t mepc;//发生异常的地址
+  word_t  mcause;//在 M-mode 执行 ecall 进来的
+  word_t  mstatus;
+  vaddr_t mtvec;//发生异常需要跳转进去的os内核的地址
 } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 
 // decode

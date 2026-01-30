@@ -17,11 +17,36 @@
 #include <cpu/cpu.h>
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
-
+//#define CONFIG_ERTACE
+// #define CONFIG_FTRACE 1
 #define R(i) gpr(i)
 #define Mr vaddr_read
 #define Mw vaddr_write
 
+void etrace_record(uintptr_t mcause, uintptr_t mepc, uintptr_t mtval, uintptr_t mstatus, uintptr_t sp,uintptr_t a0);
+word_t csr_read(int csr) {
+  switch (csr) {
+    case 0x305: return cpu.mtvec;   // mtvec
+    case 0x341: return cpu.mepc;    // mepc
+    case 0x342: return cpu.mcause;  // mcause
+    case 0x300: return cpu.mstatus; // mstatus
+    default:
+      panic("Unsupported CSR read: %x", csr);
+  }
+}
+
+void csr_write(int csr, word_t val) {
+  switch (csr) {
+    case 0x305: cpu.mtvec   = val; break;
+    case 0x341: cpu.mepc    = val; break;
+    case 0x342: cpu.mcause  = val; break;
+    case 0x300: cpu.mstatus = val; break;
+    default:
+      panic("Unsupported CSR write: %x", csr);
+  }
+}
+void call_ftrace(uint32_t pc, uint32_t target);
+void ret_ftrace(uint32_t pc);
 enum {
   TYPE_I, TYPE_U, TYPE_S,TYPE_J,TYPE_B,TYPE_r,
   TYPE_N, // none
@@ -100,6 +125,9 @@ static int decode_exec(Decode *s) {
   INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , r, R(rd) = (int32_t)src1 >> (int32_t)src2);
   INSTPAT("0000000 ????? ????? 101 ????? 01100 11", srl    , r, R(rd) = (uint32_t)src1 >> (uint32_t)src2);
   INSTPAT("0000001 ????? ????? 011 ????? 01100 11", mulhu  , r, R(rd) = ((uint64_t)src1 * (uint64_t)src2) >> 32);
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , r, 
+    //int csr = BITS(s->isa.inst, 31, 20);
+    s -> dnpc = csr_read(0x341));
 
   INSTPAT("??????? ????? ????? 110 ????? 00100 11", ori    , I, R(rd) = src1 | imm);
   INSTPAT("??????? ????? ????? 100 ????? 00100 11", xori   , I, R(rd) = src1 ^ imm); 
@@ -107,7 +135,13 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 100 ????? 00000 11", lbu    , I, R(rd) = Mr(src1 + imm, 1));
   INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi   , I, R(rd) = src1+imm);//
   INSTPAT("??????? ????? ????? 010 ????? 00000 11", lw     , I, R(rd) = Mr(src1 + imm,4));//
-  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I, R(rd) = s -> pc + 4; s -> dnpc = (src1 + imm) & ~1);
+  INSTPAT("??????? ????? ????? 000 ????? 11001 11", jalr   , I,  s -> dnpc = (src1 + imm) & ~1;R(rd) = s -> pc + 4;
+  IFDEF (CONFIG_FTRACE,{
+    int rs1 = BITS(s->isa.inst,19,15);
+    if (rd == 0 && imm == 0&&rs1==1)
+        ret_ftrace(s->pc);
+    else if (rd == 1) {call_ftrace(s->pc, s->dnpc);} })
+    );
   INSTPAT("??????? ????? ????? 000 ????? 00100 11", li     , I, R(rd) = src1 + imm);//
   INSTPAT("010000? ????? ????? 101 ????? 00100 11", srai   , I, if((imm & 0x20)==0)R(rd)=(int32_t)src1>>imm);
   INSTPAT("??????? ????? ????? 111 ????? 00100 11", andi   , I, R(rd) = src1&imm);
@@ -117,13 +151,53 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 101 ????? 00000 11", lhu    , I, R(rd) = Mr(src1 + imm,2));
   INSTPAT("??????? ????? ????? 000 ????? 00000 11", lb     , I, R(rd) = SEXT(Mr(src1 + imm, 1), 8));
   INSTPAT("??????? ????? ????? 010 ????? 00100 11", slti   , I, R(rd) = ((int32_t)src1 < (int32_t)imm) ? 1 : 0);
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, 
+    etrace_record(csr_read(0x305),csr_read(0x341),csr_read(0x342),csr_read(0x300),R(2),R(10));
+    
+    s->dnpc = isa_raise_intr(11, s->pc)
+  
+  );
+  INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I,  
+    int rs1 = BITS(s->isa.inst,19,15);
+    int csr = BITS(s->isa.inst, 31, 20);   // csr 编号
+    word_t t = csr_read(csr);       // 读 CSR 旧值
+    if (rs1 != 0) {                 // rs1 != x0 → 修改 CSR
+      csr_write(csr, t | src1);
+    }
+    if (rd != 0) {                  // rd != x0 → 写回旧值
+      R(rd) = t;
+    }
+    );
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I,
+  int rs1 = BITS(s->isa.inst,19,15);
+  int csr = BITS(s->isa.inst, 31, 20);
+  word_t  t = csr_read(csr);
+    if (rs1 != 0) {
+      csr_write(csr, src1);
+    }
+    if (rd != 0) {
+      R(rd) = t;
+    }
+);
+
+
   INSTPAT("??????? ????? ????? 000 ????? 01000 11", sb     , S, Mw(src1 + imm, 1, src2));
   INSTPAT("??????? ????? ????? 010 ????? 01000 11", sw     , S, Mw(src1 + imm, 4, src2));//
   INSTPAT("??????? ????? ????? 001 ????? 01000 11", sh     , S, Mw(src1 + imm, 2, src2));
 
-  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, R(rd) = s->pc + 4;s->dnpc = s->pc+imm);//
+  INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, s->dnpc = s->pc+imm;R(rd) = s->pc + 4;
+  //printf("FTRACE ENABLED\n");
+  IFDEF (CONFIG_FTRACE,{
+  //   if (rd == 1) {
+  //       call_trace(s->pc, s->dnpc);
+  //   }}));//
+      // if (rd == 1) {
+      //   call_ftrace(s->pc, s->dnpc);});
+      if (rd == 1) {
+        call_ftrace(s->pc, s->dnpc);
+    }}));
 
-  INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0
+  INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak , N, NEMUTRAP(s->pc, R(10))); // R(10) is $a0 NEMUTRAP(cpu.pc, cpu.gpr[10])
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv    , N, INV(s->pc));
   INSTPAT_END();
 

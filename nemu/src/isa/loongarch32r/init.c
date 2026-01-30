@@ -34,7 +34,7 @@ static void restart() {
   cpu.gpr[0] = 0;
 }
 
-void init_isa() {
+void init_isa() {//中的内置 img 只是一个 fallback（兜底的镜像），在没有传入程序文件时才会生效
   /* Load built-in image. */
   memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
 

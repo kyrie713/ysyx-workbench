@@ -131,6 +131,15 @@ config TRACE
   bool "Enable tracer"
   default y
 
+# config FTRACE
+#   depends on TRACE
+#   bool "Enable function tracing"
+#   default y
+#   help
+#     If enabled, the program will load an ELF file for function tracing.Used to trace kernel function calls for debugging and performance analysis.
+#     If disabled, it will load a BIN file.
+      
+      
 config TRACE_START
   depends on TRACE
   int "When tracing is enabled (unit: number of instructions)"

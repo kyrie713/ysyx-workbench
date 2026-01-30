@@ -23,15 +23,15 @@
  * This is useful when you use the `si' command.
  * You can modify this value as you want.
  */
-#define MAX_INST_TO_PRINT 10
+#define MAX_INST_TO_PRINT 10//最多打印 10 条指令
 #define IRINGBUF_DEPTH 16
 #define IRINGBUF_WIDTH 128
 static char iringbuf[IRINGBUF_DEPTH][IRINGBUF_WIDTH];
 static int iring_idx = 0;
 static bool iring_full = false;
 
-CPU_state cpu = {};
-uint64_t g_nr_guest_inst = 0;
+CPU_state cpu = {};//定义一个 CPU_state 类型的变量 cpu，并全部初始化为 0
+uint64_t g_nr_guest_inst = 0;//客体（guest）执行的指令数，并初始化为 0,总共执行了多少条指令,后面做性能分析（IPS、仿真速度用）
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 
@@ -45,13 +45,16 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
   scan_wp();
 }
+
+
+
 /*调用isa_exec_once取指并执行，指令与架构相关，从isa_exec_once()返回后s->snpc正好为下一条指令的PC
 将cpu.pc置为下一条应该执行的指令的地址，这个地址在s->dnpc中
 根据是否开启了itrace，将第一步执行的指令记录到s->logbuf中，然后会在trace_and_difftest中输出*/
 static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
-  isa_exec_once(s);
+  isa_exec_once(s);//decode_exec(s);
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
@@ -69,13 +72,13 @@ static void exec_once(Decode *s, vaddr_t pc) {
   int ilen_max = MUXDEF(CONFIG_ISA_x86, 8, 4);//定义当前指令集架构的 ​最大指令长度​​,X86:8,else:4
   int space_len = ilen_max - ilen;
   if (space_len < 0) space_len = 0;
-  space_len = space_len * 3 + 1;
+  space_len = space_len * 3 + 1;//+1 → 再留 1 个空格，使机器码和汇编之间有间隔
   memset(p, ' ', space_len);//向缓冲区 p写入 space_len个空格字符（' '），实现视觉对齐
   p += space_len;
 
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
-      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
+      MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);//把机器码转换成汇编指令文本，并写到 logbuf 中
   /*---iringbuf:记录当前指令*/
   snprintf(iringbuf[iring_idx],IRINGBUF_WIDTH,"%s",s->logbuf);
   iring_idx = (iring_idx+1)%IRINGBUF_DEPTH;
@@ -88,23 +91,29 @@ static void exec_once(Decode *s, vaddr_t pc) {
 检查是否程序应该退出（运行到了最后一条指令或者别的原因退出）
 更新设备状态*/
 
+
+
 /* ==========  iringbuf 打印函数  ========== */
 static void print_iringbuf(void) {
+  #ifdef CONFIG_ITRACE
   printf("\n========Recent Instruction Trace ========\n");
+  #endif
   int n = iring_full ? IRINGBUF_DEPTH : iring_idx;
   for(int i = 0;i < n; ++i){
     int pos = (iring_idx - n + i + IRINGBUF_DEPTH) % IRINGBUF_DEPTH;
     printf("%s%s\n",(i == n-1)?"--> " : "    ",iringbuf[pos]);
   }
+  #ifdef CONFIG_ITRACE
   printf("==========================================\n");
+  #endif
 }
 static void execute(uint64_t n) {
-  Decode s;
+  Decode s;//现在的 s 是一个“尚未初始化”、“什么信息都没有”的结构体
   for (;n > 0; n --) {
-    exec_once(&s, cpu.pc);
+    exec_once(&s, cpu.pc);//exec_once 就是给 s 填好一整套“这条指令的所有详细信息”。
     g_nr_guest_inst ++;
     trace_and_difftest(&s, cpu.pc);
-    if (nemu_state.state != NEMU_RUNNING) break;
+    if (nemu_state.state != NEMU_RUNNING) break;//执行nemu_trap指令会让NEMU从CPU执行指令的循环中跳出, 返回到Monitor中, 这是通过设置Monitor中的一个状态变量nemu_state来实现的.
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
@@ -137,7 +146,7 @@ void assert_fail_msg() {
 总体来说，该函数的功能是模拟CPU的工作。它根据给定的指令数量执行相应数量的指令，并根据当前的状态进行相应的处理，包括输出提示信息、设置状态、记录执行时间以及执行统计操作。*/
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
-  g_print_step = (n < MAX_INST_TO_PRINT);
+  g_print_step = (n < MAX_INST_TO_PRINT);//设置是否打印指令（itrace）
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT: case NEMU_QUIT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
@@ -145,12 +154,12 @@ void cpu_exec(uint64_t n) {
     default: nemu_state.state = NEMU_RUNNING;
   }
 
-  uint64_t timer_start = get_time();
+  uint64_t timer_start = get_time();//记录开始时间,用于统计 CPU 执行速度。
 
-  execute(n);
+  execute(n);//执行 n 条 guest 指令
 
-  uint64_t timer_end = get_time();
-  g_timer += timer_end - timer_start;
+  uint64_t timer_end = get_time();//记录结束时间
+  g_timer += timer_end - timer_start;//g_timer 是“执行指令花费的总时间”
 
   switch (nemu_state.state) {
     case NEMU_RUNNING: nemu_state.state = NEMU_STOP; break;
@@ -164,5 +173,5 @@ void cpu_exec(uint64_t n) {
           nemu_state.halt_pc);
       // fall through
     case NEMU_QUIT: statistic();
-  }
+  }//执行完 execute(n) 后，NEMU 可能有不同的状态,不同状态要做不同处理,这段代码就是在处理这些情况
 }

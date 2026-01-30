@@ -4,22 +4,41 @@
 #include <sys/time.h>
 #include <cstring>
 #include <elf.h>
-#define MEM_SIZE (32 * 1024 * 1024) // 1MB存储器
+#include "../Config/auto.conf.h"
+
+#define MEM_SIZE (512 * 1024 * 1024) // 1MB存储器
 static uint32_t memory[MEM_SIZE / 4]; // 32位存储器
 #define MEM_BASE 0x80000000
 #define RTC_ADDR 0xa0000048
 #define SERIAL_PORT 0xa0000038
 static uint64_t nowtime = 0;
+long img_size = 0;
+
+//#define CONFIG_MTRACE 1
+int skip_ref_inst = 0;
+uint8_t* guest_to_host(uint32_t paddr) {
+    return (uint8_t*)memory + (paddr - MEM_BASE);
+}
+// uint64_t get_system_time_us() {
+//     struct timeval tv;
+//     if (gettimeofday(&tv, NULL) != 0) {
+//         perror("gettimeofday failed");
+//         return 0;  
+//     }
+//     return (uint64_t)tv.tv_sec * 1000000ULL + tv.tv_usec;
+// }
+static uint64_t boot_time = 0;
 uint64_t get_system_time_us() {
     struct timeval tv;
-    if (gettimeofday(&tv, NULL) != 0) {
-        perror("gettimeofday failed");
-        return 0;  
-    }
-    return (uint64_t)tv.tv_sec * 1000000ULL + tv.tv_usec;
-}
-// 从文件加载程序到存储器
+    gettimeofday(&tv, NULL);
+    uint64_t now = (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
 
+    if (boot_time == 0) boot_time = now;
+    return now - boot_time; // 返回相对时间
+}
+
+
+// 从文件加载程序到存储器
 // 初始化存储器
 // extern "C" void init_memory() {
 
@@ -80,6 +99,7 @@ extern "C" void init_memory(const char* path) {
         exit(1);
     }
     size_t bytes_read = fread(memory, 1, MEM_SIZE, fp);  // 读取字节流
+    img_size = bytes_read;
     fclose(fp);
     //printf("Loaded %zu bytes from %s\n", bytes_read, path);
     //printf("First instruction: 0x%08x\n", memory[0]);  // 调试
@@ -112,6 +132,10 @@ extern "C" int pmem_read(int raddr) {
     
     // 对齐地址到字边界
     uint32_t aligned_addr = raddr & ~0x3; 
+    #ifdef CONFIG_MTACE 
+    printf("[MTRACE] 0x%08x: READ -> 0x08x\n",raddr+MEM_BASE,memory[aligned_addr>>2]);
+    #endif
+
     return memory[aligned_addr >> 2];
 }
 
@@ -119,6 +143,7 @@ extern "C" int pmem_read(int raddr) {
 extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
         // ---------- MMIO 处理 ----------
     if (waddr == SERIAL_PORT) {
+        skip_ref_inst = skip_ref_inst +1;
         char ch = (char)(wdata & 0xFF);
         putchar(ch);   // 或者 printf("%c", ch);
         fflush(stdout);
@@ -133,7 +158,10 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     //    waddr, wdata, wmask_int, wmask);
     // 检查地址是否在有效范围内
     if (index >= MEM_SIZE / 4) {
-        printf("Error: Memory write out of bounds at address 0x%08x\n", waddr);
+        //printf("Error: Memory write out of bounds at address 0x%08x\n", waddr);
+        //printf("pmem_write: raw waddr = 0x%08x (aligned=0x%08x), wmask=0x%x,wdata=0x%08x\n",
+       //waddr, aligned_addr, wmask,wdata);
+
         return;
     }
 
@@ -145,7 +173,9 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     if (wmask & 0x2) mem_byte[1] = (wdata >> 8) & 0xFF;
     if (wmask & 0x4) mem_byte[2] = (wdata >> 16) & 0xFF;
     if (wmask & 0x8) mem_byte[3] = (wdata >> 24) & 0xFF;
-
+    #ifdef CONFIG_MTACE
+        printf("[MTRACE] 0x%08x: WRITE <- 0x%08x mask=0x%x\n", aligned_addr + MEM_BASE, wdata, wmask);
+    #endif
     // 调试输出
     // printf("MEM WRITE: addr=0x%08x data=0x%08x mask=0x%x\n", 
     //        waddr, wdata, wmask);
