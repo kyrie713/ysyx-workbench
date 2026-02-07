@@ -66,13 +66,6 @@ void device_update() {
 #endif
 }
 
-/*整体流程总结 
-定时器：检查是否到时间 → 控制设备更新频率。
-刷新 VGA（如果开启 VGA 模拟）。
-处理 SDL 事件：
-用户点击关闭窗口 → 退出 NEMU。
-键盘按下/释放 → 把事件传递给键盘设备。
-相当于一个“硬件驱动调度器”，模拟了一个最小的操作系统对外设的管理。*/
 
 void sdl_clear_event_queue() {
 #ifndef CONFIG_TARGET_AM

@@ -24,7 +24,7 @@ typedef struct Decode {
   vaddr_t dnpc; // dynamic next pc
   ISADecodeInfo isa; //jump isa.h 
   IFDEF(CONFIG_ITRACE, char logbuf[128]);
-} Decode;//decode 阶段的数据包
+} Decode;
 
 // --- pattern matching mechanism ---
 __attribute__((always_inline))
@@ -44,9 +44,9 @@ static inline void pattern_decode(const char *str, int len,
     } \
   }
 
-#define macro2(i)  macro(i);   macro((i) + 1)//自动处理最多 64 个字符的模式字符串，不用手写 for 循环,而是用“宏的倍增展开”方式把 64 次调用一次性展开成静态代码，让编译器更快
-#define macro4(i)  macro2(i);  macro2((i) + 2)//宏展开的代码在编译器看来全是“静态顺序语句”小函数 + 内联(inline) + 静态展开会让性能更好
-#define macro8(i)  macro4(i);  macro4((i) + 4)//属于性能热点，可能每秒执行几千万次
+#define macro2(i)  macro(i);   macro((i) + 1)
+#define macro4(i)  macro2(i);  macro2((i) + 2)
+#define macro8(i)  macro4(i);  macro4((i) + 4)
 #define macro16(i) macro8(i);  macro8((i) + 8)
 #define macro32(i) macro16(i); macro16((i) + 16)
 #define macro64(i) macro32(i); macro32((i) + 32)

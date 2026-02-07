@@ -35,13 +35,11 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 }
 
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  // 1. 把 Context 放在栈顶
   uintptr_t stack_top = (uintptr_t)kstack.end & ~0xf;
   Context *c = (Context *)((uintptr_t)stack_top - sizeof(Context));
   memset(c, 0, sizeof(Context));
-  c->mepc = (uintptr_t)entry - 4;
+  c->mepc = (uintptr_t)entry;
 
-  // 4. 设置 a0 = arg（RISC-V 约定：第一个参数在 a0）
   c->gpr[10] = (uintptr_t)arg;   // a0 == x10
   c->gpr[2]  = (uintptr_t)stack_top;
   c->mstatus = 0x1800;

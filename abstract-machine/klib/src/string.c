@@ -101,29 +101,6 @@ void *memset(void *s, int c, size_t n) {
   return s;
 }
 
-// void *memmove(void *dst, const void *src, size_t n) {
-//   unsigned char *p = (unsigned char *)dst;
-//   unsigned char *q = (unsigned char *)src;
-//   if(p < q)
-//   {
-//     while(n>0)
-//     {
-//     *p++ = *q++;
-//     n--;
-//     }
-//   }
-//   else
-//   {
-//     p+=n-1;
-//     q+=n-1;
-//     while(n>0)
-//     {
-//       *p-- = *q--;
-//       n--;
-//     }
-//   }
-//   return dst;
-// }
 void *memmove(void *dst, const void *src, size_t n) {
   unsigned char *p = dst;
   const unsigned char *q = src;

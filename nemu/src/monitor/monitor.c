@@ -50,26 +50,26 @@ static char *elf_file = NULL;
 static long load_img() {
   if (img_file == NULL) {
     Log("No image is given. Use the default build-in image.");
-    return 4096; // built-in image size 如果你没有在命令行传入镜像文件，就使用内置的默认程序（大小 4096 字节）
+    return 4096; 
   }
 
-  FILE *fp = fopen(img_file, "rb");//以“二进制模式”打开文件
+  FILE *fp = fopen(img_file, "rb");
   Assert(fp, "Can not open '%s'", img_file);
 
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
-  //这是标准 C 获取文件大小的套路,fseek(fp, 0, SEEK_END) → 把文件指针跳到末尾,ftell(fp) → 返回当前位置 = 文件的字节大小.
+
   Log("The image is %s, size = %ld", img_file, size);
 
-  fseek(fp, 0, SEEK_SET);//把文件指针挪回开头,因为刚才为了获取文件大小，我们移动到了文件尾，现在要回到头部才能读
-  int ret = fread(guest_to_host(RESET_VECTOR), size, 1, fp);//fread()是C标准库函数,用来：从文件读数据到内存,返回“成功读了多少块”.把镜像文件一次性读 size 字节到 guest 内存里，从 RESET_VECTOR 这个地址开始写入。
+  fseek(fp, 0, SEEK_SET);
+  int ret = fread(guest_to_host(RESET_VECTOR), size, 1, fp);
   assert(ret == 1);
 
   fclose(fp);
-  return size;//这个 size 会传给 difftest，让 diff-test 知道你的程序大小
-}//作用：把镜像文件（你的程序）读到 NEMU 的模拟内存里
+  return size;
+}
 
-static int parse_args(int argc, char *argv[]) {//是一个用于解析命令行参数的函数
+static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
@@ -80,11 +80,11 @@ static int parse_args(int argc, char *argv[]) {//是一个用于解析命令行�
     {0          , 0                , NULL,  0 },
   };
   int o;
-  while ( (o = getopt_long(argc, argv, "-bhl:d:p:e:", table, NULL)) != -1) {//: 就代表“这个选项需要一个参数”
+  while ( (o = getopt_long(argc, argv, "-bhl:d:p:e:", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
-      case 'p': sscanf(optarg, "%d", &difftest_port); break;//收到 -p 1234 或 --port 1234 optarg是刚刚解析出来的参数的值（这里是字符串 "1234"）sscanf 用来把字符串转成整数 存到变量difftest_port
-      case 'l': log_file = optarg; break;//optarg 是解析出来的参数的值,下面的同理
+      case 'p': sscanf(optarg, "%d", &difftest_port); break;
+      case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
       case 'e': elf_file = optarg; break;
       case 1: img_file = optarg; return 0;
@@ -123,22 +123,11 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_DEVICE, init_device());
 
   /* Perform ISA dependent initialization. */
-  init_isa();//本质上是：加载程序 → 初始化 CPU → 准备开始执行
-//void init_isa() {
-//   /* Load built-in image. */
-//   memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
-
-//   /* Initialize this virtual computer system. */
-//   restart();
-// }
-// 这个函数做两件事：
-// 1. 把内建的镜像（img 数组）复制到模拟内存的 reset 地址处
-// 就像开机时把“系统镜像”加载到内存里。
-// 2. 调用 restart() 初始化 CPU 寄存器、PC 等，让模拟器进入“上电状态”。
+  init_isa();
 
   /* Load the image to memory. This will overwrite the built-in image. */
   long img_size = load_img();
-  //printf("img_size = %ld\n",img_size);
+
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
 

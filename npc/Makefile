@@ -14,14 +14,10 @@ default: $(BIN)
 
 $(shell mkdir -p $(BUILD_DIR))  
 
-# SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp) 
-# $(SRC_AUTO_BIND): $(NXDC_FILES)
-# 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@ 
 
 # project source
-VSRCS = $(shell find $(abspath ./vsrc) -name "*.v") # 所有.v文件 即你编写的verilog文件
+VSRCS = $(shell find $(abspath ./vsrc) -name "*.v") 
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp") 
-# 所有c++文件，其实就是sim_main.cpp和auto_bind.cpp
 #CSRCS += $(SRC_AUTO_BIND)
 
 
@@ -31,7 +27,6 @@ CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*
 INCFLAGS = $(addprefix -I, $(INC_PATH))
 CXXFLAGS += $(INCFLAGS) -I /home/huang/ysyx-workbench/nemu/tools/capstone/repo/include -DTOP_NAME="\"V$(TOPNAME)\""
 LDFLAGS += -L /home/huang/ysyx-workbench/nemu/tools/capstone/repo/ -lcapstone -lSDL2 -lSDL2_image -lreadline
-LDFLAGS += -L /home/huang/ysyx-workbench/nemu/build/riscv32-nemu-interpreter-so
 
 
 # Kconfig 配置
@@ -68,7 +63,7 @@ sim: $(BIN)
 	./build/top +trace  
 
 run: $(BIN)
-	./$(BIN) $(IMAGE) +trace
+	./$(BIN) $(IMAGE) 
 	
 clean:
 	rm -rf $(BUILD_DIR) wave.vcd

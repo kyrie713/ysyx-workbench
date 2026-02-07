@@ -37,6 +37,7 @@ extern "C" void notify_ebreak() {
 
 void sdb_mainloop();
 void init_disasm();
+void init_device();
 extern "C" void init_memory(const char* path);
 void parse_elf(const char *elf_file);
 void init_difftest(char *ref_so_file, long img_size, int port);
@@ -75,20 +76,18 @@ int main(int argc,char** argv,char** env){
     // cpu.pc = 0x80000000;
     init_memory(image_path);
     printf("img_size = %ld\n",img_size);
-    // char ref_so_file[] = "/home/huang/ysyx-workbench/nemu/build/riscv32-nemu-interpreter-so";
-    // init_difftest(ref_so_file,img_size, difftest_port);
 
-
-    init_disasm();///home/huang/ysyx-workbench/am-kernels/tests/cpu-tests/build/npc-log.txt
-    // itrace_fp = fopen("../../am-kernels/tests/cpu-tests/build/npc-log.txt", "w");
     
+    init_disasm();
+    
+    init_device();
     itrace_fp = fopen("/home/huang/ysyx-workbench/am-kernels/tests/cpu-tests/build/npc-log.txt", "w");
     printf("itrace_fp = %p\n", (void *)itrace_fp); 
     assert(itrace_fp);
     g_nr_guest_inst = 0;
     contextp = new VerilatedContext;
     contextp->commandArgs(argc, argv);
-    top = new Vtop{contextp};//创建一个Vtop实例，Vtop是你的顶层Verilog模块的C++表示。contextp是Verilator上下文对象，用于管理仿真。   
+    top = new Vtop{contextp};
     #ifdef  CONFIG_WAVEFORM
     tfp = new VerilatedVcdC; //这是用于波形生成的对象
     contextp->traceEverOn(true);

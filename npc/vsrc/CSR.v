@@ -4,16 +4,16 @@ module CSR(
     input rst,
     input I_ecall,
     input I_csrrs,
-    input I_csrrw,                    //判断指令是不是 csrrw
+    input I_csrrw,                    
     input I_mret,
-    input [11:0] csr_addr,            // SR 地址 = inst[31:20]
-    input [31:0] csr_wdata,           //要写进CSR的数据
+    input [11:0] csr_addr,            
+    input [31:0] csr_wdata,           
     output reg [31:0] csr_mtvec,
     output reg [31:0] csr_mcause,
     output reg [31:0] csr_mstatus,
     output reg [31:0] csr_mepc,
     output reg [31:0] csr_mret_mepc,
-    output reg [31:0] csr_rdata      //从CSR寄存器读到的数据
+    output reg [31:0] csr_rdata      
 
 );
 

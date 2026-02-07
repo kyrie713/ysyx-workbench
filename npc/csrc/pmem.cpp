@@ -5,28 +5,34 @@
 #include <cstring>
 #include <elf.h>
 #include "../Config/auto.conf.h"
+typedef uint32_t paddr_t;
+typedef uint32_t word_t;
+
 
 #define MEM_SIZE (512 * 1024 * 1024) // 1MB存储器
 static uint32_t memory[MEM_SIZE / 4]; // 32位存储器
 #define MEM_BASE 0x80000000
 #define RTC_ADDR 0xa0000048
 #define SERIAL_PORT 0xa0000038
+#define CONFIG_VGA_CTL_MMIO 0xa0000100
+#define CONFIG_FB_ADDR 0xa1000000
+uint32_t screen_size();
+
 static uint64_t nowtime = 0;
 long img_size = 0;
+#define KEYBOARD_ADDR 0xa0000060
 
 //#define CONFIG_MTRACE 1
+
+word_t mmio_read(paddr_t addr, int len);
+void mmio_write(paddr_t addr, int len, word_t data);
+
+
 int skip_ref_inst = 0;
 uint8_t* guest_to_host(uint32_t paddr) {
     return (uint8_t*)memory + (paddr - MEM_BASE);
 }
-// uint64_t get_system_time_us() {
-//     struct timeval tv;
-//     if (gettimeofday(&tv, NULL) != 0) {
-//         perror("gettimeofday failed");
-//         return 0;  
-//     }
-//     return (uint64_t)tv.tv_sec * 1000000ULL + tv.tv_usec;
-// }
+
 static uint64_t boot_time = 0;
 uint64_t get_system_time_us() {
     struct timeval tv;
@@ -38,57 +44,6 @@ uint64_t get_system_time_us() {
 }
 
 
-// 从文件加载程序到存储器
-// 初始化存储器
-// extern "C" void init_memory() {
-
-//     for (int i = 0; i < MEM_SIZE / 4; i++) {
-//         memory[i] = 0;
-//     }
-//     // memory[1] = 0x00C10093; //addi  ra sp 12
-//     // memory[0] = 0x00051137; //lui	sp,0x51;
-//     // //memory[2] = 0x00918133; //add   gp, ra, sp  
-//     // memory[2] = 0x002081B3; //add   gp, sp, ra      	
-//     // // memory[1] = 0x010000e7;
-//     // memory[3] = 0x02302823; //sw x3, 48(x0)   # 将 gp (x3) 的值存储到内存地址 24
-//     // //memory[4] = 0x01E02203; // lw x4, 30(x0)
-//     // memory[4] = 0x03002203; //# 将内存地址 48 的值加载到 tp (x4)
-//     // memory[5] = 0x03004403;
-//     memory[0] = 0x000010b7;// li ra, 1000
-//     memory[1] = 0x22408093;//# addi ra, ra, 548
-//     memory[2] = 0x00100073; //# ebreak
-//     printf("Memory initialized with single instruction: 0x%08x\n", memory[0]);
-//     printf("Memory initialized with single instruction: 0x%08x\n", memory[1]);
-// }
-
-// extern "C" void init_memory(const char* path){
-//     for (int i = 0; i < MEM_SIZE / 4; i++) {
-//         memory[i] = 0;
-//     }   
-//     FILE* fp = fopen(path,"rb");
-//     if(!fp) {
-//         perror("Failed to open hex file");
-//         exit(1);
-//     }
-//     uint32_t addr =0;
-//     char line[9];
-//     while(fscanf(fp,"%8s",line) == 1) {
-//         if(line[0] == '\0') continue;
-//         //转换十六进制字符串为uint32_t
-//         memory[addr ++ ] = (uint32_t)strtoul(line,NULL,16);
-//         // 检查地址边界
-//         if (addr >= MEM_SIZE/4) {
-//             fprintf(stderr, "Warning: Memory capacity exceeded at line %d\n", addr);
-//             break;
-//         }
-    
-//     }
-//     fclose(fp);
-//     printf("Memory initialized with single instruction: 0x%08x\n", memory[0]);//调试
-//     printf("Memory initialized with single instruction: 0x%08x\n", memory[1]);  //调试  
-//     printf("Loaded %d instructions from %s\n", addr, path); 
-    
-// }
 extern "C" void init_memory(const char* path) {
     for (int i = 0; i < MEM_SIZE / 4; i++) {
         memory[i] = 0;
@@ -107,6 +62,17 @@ extern "C" void init_memory(const char* path) {
 // 存储器读取函数
 extern "C" int pmem_read(int raddr) {
     // ----------MMIO-----------
+    if(raddr == KEYBOARD_ADDR)
+    {
+        return mmio_read(raddr, 4);
+    }
+    if (raddr >= CONFIG_VGA_CTL_MMIO && raddr < CONFIG_VGA_CTL_MMIO + 8) {
+        return mmio_read(raddr, 4);
+    }
+    if (raddr >= CONFIG_FB_ADDR && raddr < CONFIG_FB_ADDR + screen_size()) {
+        return mmio_read(raddr, 4);
+    }
+
     if(raddr == RTC_ADDR){
         nowtime = get_system_time_us();
         return (uint32_t) nowtime;
@@ -139,9 +105,19 @@ extern "C" int pmem_read(int raddr) {
     return memory[aligned_addr >> 2];
 }
 
-// 增强的存储器写入函数
+
 extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
         // ---------- MMIO 处理 ----------
+    // VGA 控制寄存器
+    if (waddr >= CONFIG_VGA_CTL_MMIO && waddr < CONFIG_VGA_CTL_MMIO + 8) {
+            mmio_write(waddr, 4, wdata);
+            return;
+        }
+        // VGA 显存
+    if (waddr >= CONFIG_FB_ADDR && waddr < CONFIG_FB_ADDR + screen_size()) {
+            mmio_write(waddr, 4, wdata);
+            return;
+        }
     if (waddr == SERIAL_PORT) {
         skip_ref_inst = skip_ref_inst +1;
         char ch = (char)(wdata & 0xFF);
@@ -158,9 +134,6 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     //    waddr, wdata, wmask_int, wmask);
     // 检查地址是否在有效范围内
     if (index >= MEM_SIZE / 4) {
-        //printf("Error: Memory write out of bounds at address 0x%08x\n", waddr);
-        //printf("pmem_write: raw waddr = 0x%08x (aligned=0x%08x), wmask=0x%x,wdata=0x%08x\n",
-       //waddr, aligned_addr, wmask,wdata);
 
         return;
     }
@@ -176,7 +149,4 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     #ifdef CONFIG_MTACE
         printf("[MTRACE] 0x%08x: WRITE <- 0x%08x mask=0x%x\n", aligned_addr + MEM_BASE, wdata, wmask);
     #endif
-    // 调试输出
-    // printf("MEM WRITE: addr=0x%08x data=0x%08x mask=0x%x\n", 
-    //        waddr, wdata, wmask);
 }

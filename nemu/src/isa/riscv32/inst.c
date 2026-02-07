@@ -18,7 +18,7 @@
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
 //#define CONFIG_ERTACE
-// #define CONFIG_FTRACE 1
+//#define CONFIG_FTRACE 1
 #define R(i) gpr(i)
 #define Mr vaddr_read
 #define Mw vaddr_write
@@ -59,15 +59,6 @@ enum {
 #define immS() do { *imm = (SEXT(BITS(i, 31, 25), 7) << 5) | BITS(i, 11, 7); } while(0)
 #define immB() do { *imm = SEXT((BITS(i, 31, 31)<<12| BITS(i, 7, 7) << 11 | BITS(i,30,25) << 5 | BITS(i, 11, 8) << 1 ),13) ;} while(0)
 #define immJ() do { *imm = SEXT((BITS(i,31, 31)<<20| BITS(i, 19, 12) << 12 | BITS(i, 20, 20) << 11 | BITS(i,30,21) << 1),21);} while(0)
-/*在decode_exec函数中调用
-首先从 s->isa.inst.val 中获取当前指令的值，存储在变量 i 中。
-使用 BITS 宏从指令中提取出相应的字段值。例如，BITS(i, 19, 15) 表示从指令的第 19 位到第 15 位提取出一个字段值，存储在变量 rs1 中。
-将 BITS(i, 11, 7) 的字段值赋给 *rd，即将目标操作数的寄存器编号存储在 rd 指针指向的位置。
-根据指令的类型 type 进行不同的操作数解析：
-如果 type 是 TYPE_I，则调用 src1R() 宏将源操作数1的值存储在 *src1 中，调用 immI() 宏将立即数的值存储在 *imm 中。
-如果 type 是 TYPE_U，则调用 immU() 宏将立即数的值存储在 *imm 中。
-如果 type 是 TYPE_S，则调用 src1R() 宏将源操作数1的值存储在 *src1 中，调用 src2R() 宏将源操作数2的值存储在 *src2 中，调用 immS() 宏将立即数的值存储在 *imm 中。
-总体来说，这段代码根据指令的类型解析指令的操作数。根据不同的指令类型，从指令中提取出对应的字段值，并将其存储在相应的变量中，以便后续使用。*/
 
 static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_t *imm, int type) {
   uint32_t i = s->isa.inst;
@@ -115,11 +106,11 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000000 ????? ????? 110 ????? 01100 11", or     , r, R(rd) = src1 | src2);
   INSTPAT("0000000 ????? ????? 001 ????? 01100 11", sll    , r, R(rd) = (uint32_t)src1 << src2);
   INSTPAT("0000000 ????? ????? 111 ????? 01100 11", and    , r, R(rd) = src1 & src2);
-  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , r, R(rd) = (int32_t)src1 * (int32_t)src2);//没加(int32_t)就会有错误
+  INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul    , r, R(rd) = (int32_t)src1 * (int32_t)src2);
   INSTPAT("0000001 ????? ????? 100 ????? 01100 11", Div    , r, R(rd) = (int32_t)src1 / (int32_t)src2);
   INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem    , r, R(rd) = (int32_t)src1 % (int32_t)src2);
   INSTPAT("0000000 ????? ????? 010 ????? 01100 11", slt    , r, R(rd) = ((int32_t)src1 < (int32_t)src2));
-  INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh   , r, R(rd) = (int64_t)(int32_t)src1 * (int64_t)(int32_t)src2>>32);//(int64_t)(int32_t)src1 * (int32_t)src2)>>32写成这样mul-longlong就报错
+  INSTPAT("0000001 ????? ????? 001 ????? 01100 11", mulh   , r, R(rd) = (int64_t)(int32_t)src1 * (int64_t)(int32_t)src2>>32);
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu   , r, R(rd) = (uint32_t)src1 % (uint32_t)src2);
   INSTPAT("0000001 ????? ????? 101 ????? 01100 11", Divu   , r, R(rd) = (uint32_t)src1 / (uint32_t)src2);
   INSTPAT("0100000 ????? ????? 101 ????? 01100 11", sra    , r, R(rd) = (int32_t)src1 >> (int32_t)src2);
@@ -159,12 +150,12 @@ static int decode_exec(Decode *s) {
   );
   INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I,  
     int rs1 = BITS(s->isa.inst,19,15);
-    int csr = BITS(s->isa.inst, 31, 20);   // csr 编号
-    word_t t = csr_read(csr);       // 读 CSR 旧值
-    if (rs1 != 0) {                 // rs1 != x0 → 修改 CSR
+    int csr = BITS(s->isa.inst, 31, 20);   
+    word_t t = csr_read(csr);       
+    if (rs1 != 0) {                 
       csr_write(csr, t | src1);
     }
-    if (rd != 0) {                  // rd != x0 → 写回旧值
+    if (rd != 0) {                  
       R(rd) = t;
     }
     );
@@ -188,11 +179,6 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, s->dnpc = s->pc+imm;R(rd) = s->pc + 4;
   //printf("FTRACE ENABLED\n");
   IFDEF (CONFIG_FTRACE,{
-  //   if (rd == 1) {
-  //       call_trace(s->pc, s->dnpc);
-  //   }}));//
-      // if (rd == 1) {
-      //   call_ftrace(s->pc, s->dnpc);});
       if (rd == 1) {
         call_ftrace(s->pc, s->dnpc);
     }}));

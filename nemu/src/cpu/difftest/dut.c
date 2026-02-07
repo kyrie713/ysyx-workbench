@@ -58,8 +58,7 @@ void difftest_skip_dut(int nr_ref, int nr_dut) {
     ref_difftest_exec(1);
   }
 }
-/*ref_difftest_exec(1) 让“参考设计（REF，通常是 Spike 或 QEMU）”向前执行 1 条指令，
-并保持原地不动，不会把结果直接写回 NEMU 的寄存器——只是把 REF 内部的 PC 和寄存器更新到“下一条”状态*/
+
 void init_difftest(char *ref_so_file, long img_size, int port) {
   assert(ref_so_file != NULL);
 
@@ -69,14 +68,7 @@ void init_difftest(char *ref_so_file, long img_size, int port) {
 
   ref_difftest_memcpy = dlsym(handle, "difftest_memcpy");
   assert(ref_difftest_memcpy);
-  /*ref_difftest_memcpy 是 运行时绑定到 REF 的函数指针；
-  difftest_memcpy 是 REF 里的真实实现，但 DUT 编译时并不知道它在哪里；
-  所以 DUT 必须通过函数指针间接调用，才能实现 和不同参考模型解耦。
-  dlsym 在运行时查找共享库中名为 "difftest_memcpy" 的符号，返回其地址（类型 void *）。
-  这里把返回值赋给全局函数指针 ref_difftest_memcpy
-  (这个指针之前在文件顶部声明为 void (*ref_difftest_memcpy)(paddr_t, void*, size_t, bool)）
-  后续通过 ref_difftest_memcpy(...) 的调用，会调用 REF 内部的 difftest_memcpy ,
-  实现来在 REF 内存与宿主缓冲区之间搬运数据*/
+
   ref_difftest_regcpy = dlsym(handle, "difftest_regcpy");
   assert(ref_difftest_regcpy);
 
@@ -112,7 +104,7 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
   CPU_state ref_r;
 
   if (skip_dut_nr_inst > 0) {
-    ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);//调用完,ref_r.gpr[i]里存的就是REF的通用寄存器值,ref_r.pc里存的就是REF的PC值
+    ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
     if (ref_r.pc == npc) {
       skip_dut_nr_inst = 0;
       checkregs(&ref_r, npc);
@@ -126,13 +118,13 @@ void difftest_step(vaddr_t pc, vaddr_t npc) {
 //在执行某些“特殊指令”时，别的地方会把它设成 true,就代表：这条指令不要求 REF 来执行
   if (is_skip_ref) {
     // to skip the checking of an instruction, just copy the reg state to reference design
-    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);//把 DUT（NEMU）的寄存器状态，复制到 REF 里去
+    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
     is_skip_ref = false;
     return;
   }
 
-  ref_difftest_exec(1);//调用REF difftest_exec函数,执行1次,NEMU已经在外面执行1次,这里让 REF 跟上步伐.
-  ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);//把REF的寄存器状态 拷贝出来，放到ref_r里保存一下
+  ref_difftest_exec(1);
+  ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
   checkregs(&ref_r, pc);
 }

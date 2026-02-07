@@ -27,37 +27,21 @@ extern void __am_asm_trap(void);
 bool cte_init(Context*(*handler)(Event, Context*)) {
   // initialize exception entry
   asm volatile("csrw mtvec, %0" : : "r"(__am_asm_trap));
-  //直接将异常入口地址设置到mtvec寄存器中
-  // register event handler
   user_handler = handler;
 
   return true;
 }
-//pcb[0].cp = kcontext((Area) { pcb[0].stack, &pcb[0] + 1 }, f, (void *)1L);
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
-  // 1. 把 Context 放在栈顶
   uintptr_t stack_top = (uintptr_t)kstack.end & ~0xf;
   Context *c = (Context *)((uintptr_t)stack_top - sizeof(Context));
   memset(c, 0, sizeof(Context));
   c->mepc = (uintptr_t)entry;
 
-  // 4. 设置 a0 = arg（RISC-V 约定：第一个参数在 a0）
   c->gpr[10] = (uintptr_t)arg;   // a0 == x10
   c->gpr[2]  = (uintptr_t)stack_top;
   c->mstatus = 0x1800;
   return c;
 }
-// 高地址
-// 0x80002000  ← 原栈顶
-// │
-// │  Context
-// │
-// 0x80001Fxx  ← c（Context 起始地址）
-// │
-// │  空栈
-// │
-// 0x80001000
-// 低地址
 
 void yield() {
 #ifdef __riscv_e

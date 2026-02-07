@@ -52,9 +52,7 @@ void parse_elf(const char *elf_file) {
         return;
     }
 
-    //节区头部表的构建
-    Elf32_Shdr shdr[ehdr.e_shnum];
-    //把文件指针挪到节头表位置 
+    Elf32_Shdr shdr[ehdr.e_shnum]; 
     fseek(fp, ehdr.e_shoff, SEEK_SET);
     if (fread(shdr, sizeof(Elf32_Shdr), ehdr.e_shnum, fp) != ehdr.e_shnum) {
 		fprintf(stderr, "[ftrace] : Failed to read section headers\n");
@@ -63,17 +61,8 @@ void parse_elf(const char *elf_file) {
 	}
 
 
-    // //获取节区名称表
-    // Elf32_Shdr shstrtab = shdr[ehdr.e_shstrndx];
-    // char shstrtable[shstrtab.sh_size];
-    // fseek(fp, shstrtab.sh_offset, SEEK_SET);
-	// if (fread(shstrtable, shstrtab.sh_size, 1, fp) != 1) {
-	// 	fprintf(stderr, "Failed to restore section string table\n");
-	// 	fclose(fp);
-	// 	return;
-	// }
 
-    // 查找符号表
+
     int symtab_idx; 
     int strtab_idx;
     for(int i = 0; i < ehdr.e_shnum; i++) {
@@ -83,7 +72,7 @@ void parse_elf(const char *elf_file) {
     Elf32_Shdr symtab_hdr = shdr[symtab_idx];
     
 
-    //读取符号表
+
     Elf32_Sym *symtab = (Elf32_Sym *)malloc(symtab_hdr.sh_size);
     fseek(fp, symtab_hdr.sh_offset, SEEK_SET);
     if (fread(symtab, symtab_hdr.sh_size, 1, fp) != 1) {
@@ -92,9 +81,8 @@ void parse_elf(const char *elf_file) {
     }
     strtab_idx=symtab_hdr.sh_link;
     Elf32_Shdr strtab_hdr = shdr[strtab_idx];
-    //debug
+
     #ifdef CONFIG_FTRACE
-    // 打印 strtab_hdr 结构体内容
     printf("strtab_hdr:\n");
     printf("  sh_name: 0x%08x\n", strtab_hdr.sh_name);
     printf("  sh_type: 0x%08x\n", strtab_hdr.sh_type);
@@ -116,7 +104,6 @@ void parse_elf(const char *elf_file) {
       free(strtab);
     }
 
-    //统计符号数量，提取函数名 地址以及大小
     int symbol_count = symtab_hdr.sh_size / sizeof(Elf32_Sym);
     for(int i = 0; i < symbol_count; i++) {
         if (ELF32_ST_TYPE(symtab[i].st_info) == STT_FUNC) {
@@ -129,10 +116,8 @@ void parse_elf(const char *elf_file) {
            func_name, func_addr, func_addr + func_size,
            func_size ? "" : " (size unknown)");
            #endif
-             // 检查符号名称是否合法
             if (func_name == NULL || func_name[0] == '\0' || func_name[0] == '.') {
                 printf("[ftrace]: skipping invalid function name '%s'\n", func_name);
-                //continue;  // 跳过无效的符号
             }
             if (func_num < 4096) {
                 func_table[func_num++] = (Func_struct){
@@ -143,11 +128,6 @@ void parse_elf(const char *elf_file) {
             } else {
                 printf("[ftrace]: func_table overflow!\n");
             }
-            // func_table[func_num++] = (Func_struct){
-            //     .name = strdup(func_name),
-            //     .start = func_addr,  
-            //     .size = func_size
-            // };
         }
     }
     free(symtab);
@@ -161,33 +141,14 @@ static void printf_space(){
         printf(" ");
     }
 }
-// void push_func(const char *func_name) {
-//     if (call_depth < 1024){
-//         call_stack[call_depth++] = func_name;
-//     } else {
-//         printf("Error: call stack overflow!\n");
-//     }
-// }
 
-// const char *pop_func() {
-//     if (call_depth > 0) {
-//         return call_stack[--call_depth];
-//     }
-//     return "???";  // Return a default value if stack is empty
-// }
 
 void call_ftrace(uint32_t pc, uint32_t target) {
     const char *call_func_name = find_func(target);
-//printf("call_depth = %d\n", call_depth);  // 调试输出栈深度
     printf("0x%08x:",pc);
     printf_space();
     printf("call [%s @0x%08x]\n", call_func_name, target);
     call_depth++;
-    // const char *call_func_name = find_func(target);
-    // printf("call_depth = %d\n", call_depth);  // Debugging stack depth
-    // printf_space();
-    // printf("0x%08x: call [%s @0x%08x]\n", pc, call_func_name, target);
-    // push_func(call_func_name);  // Push function onto the stack
 }
  
 void ret_ftrace(uint32_t pc) {
@@ -195,7 +156,7 @@ void ret_ftrace(uint32_t pc) {
         call_depth--;
         const char *ret_func_name = find_func(pc);
         if (ret_func_name == NULL) {
-            ret_func_name = "Unknown";  // 如果没有找到函数名，使用 "Unknown"
+            ret_func_name = "Unknown";  
         }
         printf("0x%08x:",pc);
         printf_space();

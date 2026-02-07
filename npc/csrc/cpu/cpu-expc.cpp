@@ -11,6 +11,7 @@
 #include "verilated.h"
 #include "../../build/obj_dir/Vtop___024root.h"
 
+#define CONFIG_DEVICE 1
 //#define ITRACE
 //#define ENABLE_WAVEFORM
 extern Vtop* top;
@@ -19,6 +20,7 @@ extern bool simulation_finished;
 extern FILE* itrace_fp;
 extern uint64_t g_nr_guest_inst;
 uint32_t cpu_dnpc;
+void device_update();
 void disassemble(char *str,int size,uint64_t pc,uint8_t *code,int nbyte);
 void init_disasm();
 void call_ftrace(uint32_t pc, uint32_t target);
@@ -164,7 +166,9 @@ static void execute(uint64_t n) {
             difftest(cpu.pc, cpu_dnpc);   // 正常 diff
         }
         #endif
-        //IFDEF(CONFIG_DEVICE, device_update());
+        #ifdef CONFIG_DEVICE 
+          device_update();
+        #endif
         if (simulation_finished) break;
     }
 }
