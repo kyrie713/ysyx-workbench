@@ -37,21 +37,6 @@ module WBU(
     Reg_WE = R_TYPE | I_TYPE | U_TYPE | J_TYPE | I_csrrs | I_csrrw;
     
     RegWriteData = 32'b0;
-    // 寄存器写回数据选择
-    // if(l_lw) begin 
-    //     RegWriteData = MemReadData;
-    // end else if (R_TYPE|I_TYPE_ARITH|U_TYPE|I_sltiu|I_srai|I_xori|I_andi) begin
-    //     RegWriteData = ALU_OUT;
-    // end else if(I_jalr | J_jal) begin
-    //     RegWriteData = PC_plus_4;
-    // end else if(l_lbu) begin
-    //     case(ALU_OUT[1:0])
-    //       2'b00: RegWriteData = {24'b0, MemReadData[7:0]};
-    //       2'b01: RegWriteData = {24'b0, MemReadData[15:8]};
-    //       2'b10: RegWriteData = {24'b0, MemReadData[23:16]};
-    //       2'b11: RegWriteData = {24'b0, MemReadData[31:24]};
-    //     endcase
-    // end
     case (1'b1)
         l_lw: RegWriteData = MemReadData;
         l_lbu: begin

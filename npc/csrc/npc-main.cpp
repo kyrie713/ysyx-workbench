@@ -73,7 +73,7 @@ int main(int argc,char** argv,char** env){
     #ifdef CONFIG_FTRACE
     parse_elf(elf_path);
     #endif
-    // cpu.pc = 0x80000000;
+
     init_memory(image_path);
     printf("img_size = %ld\n",img_size);
 
@@ -89,10 +89,10 @@ int main(int argc,char** argv,char** env){
     contextp->commandArgs(argc, argv);
     top = new Vtop{contextp};
     #ifdef  CONFIG_WAVEFORM
-    tfp = new VerilatedVcdC; //这是用于波形生成的对象
+    tfp = new VerilatedVcdC; 
     contextp->traceEverOn(true);
-    top->trace(tfp, 99); //这句代码和上面那句代码用于启用波形跟踪和连接波形对象。
-    tfp->open("wave.vcd"); //这是用于打开波形文件的代码
+    top->trace(tfp, 99); 
+    tfp->open("wave.vcd"); 
     #endif
     print_yellow_logo();
     printf("Welcome to \033[1;33;41mriscv32-NPC!\033[0m\n"); // 红底黄字
@@ -112,11 +112,7 @@ int main(int argc,char** argv,char** env){
         contextp->timeInc(1);
     }
     top->rst = 0;
-    // printf("Registers after reset:\n");
-    // for (int i=0;i<32;i++) printf("x%d = 0x%08x\n", i, cpu.gpr[i]);
     cpu.pc = top->PC;
-    //printf("cpu_pc = 0x%08x\n",cpu.pc);
-    //cpu.gpr[2] = MEM_BASE + MEM_SIZE; // 初始化 SP
     char ref_so_file[] = "/home/huang/ysyx-workbench/nemu/build/riscv32-nemu-interpreter-so";
     init_difftest(ref_so_file,img_size, difftest_port);
 
@@ -124,7 +120,7 @@ int main(int argc,char** argv,char** env){
     sdb_mainloop();
     printf("total_inst: %ld\n",g_nr_guest_inst);
     #ifdef CONFIG_WAVEFORM 
-    tfp->close();//这是用于关闭波形文件的代码
+    tfp->close();
     #endif
     delete contextp;
     return 0;

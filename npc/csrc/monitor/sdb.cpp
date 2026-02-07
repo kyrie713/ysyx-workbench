@@ -20,17 +20,15 @@ void display_wp();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
-  static char *line_read = NULL;//line_read：这是一个指向字符串的指针，用于存储用户输入的行
+  static char *line_read = NULL;
   if (line_read) {
     free(line_read);
     line_read = NULL;
   }
 
-  line_read = readline("(npc) ");//用于处理用户输入，支持自动补全、历史记录等
-  //readline 函数会读取用户输入的一行，并返回一个指向动态分配的字符串的指针
-  //如果用户直接按回车键（没有输入任何内容），line_read 可能为 NULL。
+  line_read = readline("(npc) ");
   if (line_read && *line_read) {
-    add_history(line_read);//将输入的行添加到历史记录
+    add_history(line_read);
   }
   return line_read;
 }
@@ -89,94 +87,11 @@ static int cmd_x(char *args){
   return 0;
 }
 
-//word_t expr(char *e, bool *success);
-// static int cmd_p(char *args){
-//   // char *arg = strtok(args," ");
-//   if(args ==NULL)
-//   {
-//     printf("empty exprerssion\n");
-//   }
-//   else {
-//     bool success = false;
-//     uint32_t result = expr(args,&success);
-//     if(success)
-//     {
-//       printf("result = %u\n",result);
-//     }
-//     else {
-//       printf("Error\n");
-//     }
-//   }
-//   return 0;
-// }
-// static int cmd_ext(char *args){//const 修饰的是 char，表示指针所指向的内容（字符）是不能被修改的。
-//   const char *input_file_path = "/home/huang/ysyx-workbench/nemu/tools/gen-expr/input";
-//   FILE *input_file = fopen(input_file_path,"r");
-//   if(input_file == NULL)
-//   {
-//     perror("Failed to open input file");
-//     return -1;
-//   }
-//   char line[4096];//定义了一个字符数组 line用于存储从文件中读取的每一行
-//   int all_test = 0,past_test = 0;
-//   while(fgets(line,sizeof(line),input_file)){//fgets 函数逐行读取文件内容，每次读取一行存储到 line 中
-//     char *expected_result_str = strtok(line," ");
-//     char *expr_str = strtok(NULL,"\n");
-//     if (expected_result_str == NULL || expr_str == NULL) {
-//       fprintf(stderr, "Invalid test case format: %s", line);
-//       continue;
-//     }//stderr 是C语言标准库中的一个宏，表示标准错误流
-//     int expected_result = atoi(expected_result_str);//使用 atoi 函数将预期结果从字符串转换为整数。
-//     bool success = false;
-//     word_t result = expr(expr_str,&success);
-//     all_test ++;
-//     if(success && result == expected_result)
-//     {
-//       past_test ++;
-//     }    
-//   }
-//   printf("%d test,%d passed\n",all_test,past_test);
-//   fclose(input_file);
-//   return 0;
-// }
-// void set_wp(char *arg, word_t value);
-// void delete_wp(int n);
-// static int cmd_w(char *args)
-// {
-//   if(args == NULL)
-//   {
-//     printf("Unknown input, the standard format is 'w EXPR'\n");
-//     return 0;
-//   }
-//   bool success;
-//   word_t res = expr(args, &success);
-//   if(!success)
-//     printf("The expression is problematic\n");
-//   else 
-//     set_wp(args, res);
-  
-//   return 0;
-// }
-
-
-// static int cmd_d(char *args)
-// {
-//   if(args == NULL)
-//   {
-//     printf("Unknown input, the standard format is 'd N'\n");
-//     return 0;
-//   }
-//   char *arg = strtok(NULL, " ");
-//   int n = strtol(arg, NULL, 10);//strtol 把字符串转为整数
-//   delete_wp(n);
-//   return 0;
-// }
-
 
 static struct {
   const char *name;
   const char *description;
-  int (*handler) (char *);//指向处理函数的指针。这个函数接受一个字符串参数 char *，并返回一个整数。
+  int (*handler) (char *);
 } cmd_table [] = {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
@@ -186,19 +101,15 @@ static struct {
   { "si", "Execute the program step by step and pause after executing N instructions. If N is not specified, the default value is 1",cmd_si},
   { "info", "Print the program state", cmd_info},
   { "x", "scanf men", cmd_x},
-//   { "p", "expression evaluation",cmd_p},
-//   { "ext","test",cmd_ext},
-//   { "w","watchpoint",cmd_w},
-//   { "d","deletepoint",cmd_d},
 };
 
 
 #define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
-#define NR_CMD ARRLEN(cmd_table)//ARRLEN 是一个宏，用于计算数组的长度
+#define NR_CMD ARRLEN(cmd_table)
 
 static int cmd_help(char *args) {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");//strtok(NULL, " ") 会继续切分上一次的同一个字符串，返回下一个 token。
+  char *arg = strtok(NULL, " ");
   int i;
 
   if (arg == NULL) {
@@ -228,21 +139,21 @@ void sdb_mainloop() {
     cmd_c(NULL);
     return;
   }
-//如果程序处于批处理模式，则调用 cmd_c(NULL) 函数并退出主循环。不是与用户交互
+
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
-//rl_gets()会返回一个指向字符串的指针,如果读取失败（例如输入流结束），它会返回NULL
+
     /* extract the first token as the command */
-    char *cmd = strtok(str, " ");//会把第一个空格前的内容切出来作为命令名
+    char *cmd = strtok(str, " ");
     if (cmd == NULL) { continue; }
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;//命令行参数 +1让指针越过\0
+    char *args = cmd + strlen(cmd) + 1;
     if (args >= str_end) {
       args = NULL;
-    }////如果命令后什么都没有,就把args设置为 NULL
+    }
 
 #ifdef CONFIG_DEVICE
     extern void sdl_clear_event_queue();
@@ -251,7 +162,7 @@ void sdb_mainloop() {
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }//如果命令处理函数告知“要退出”，那整个 sdb_mainloop() 也返回（退出调试器）
+        if (cmd_table[i].handler(args) < 0) { return; }
         break;
       }
     }

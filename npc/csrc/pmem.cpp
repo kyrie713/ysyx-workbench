@@ -40,7 +40,7 @@ uint64_t get_system_time_us() {
     uint64_t now = (uint64_t)tv.tv_sec * 1000000 + tv.tv_usec;
 
     if (boot_time == 0) boot_time = now;
-    return now - boot_time; // 返回相对时间
+    return now - boot_time; 
 }
 
 
@@ -56,10 +56,9 @@ extern "C" void init_memory(const char* path) {
     size_t bytes_read = fread(memory, 1, MEM_SIZE, fp);  // 读取字节流
     img_size = bytes_read;
     fclose(fp);
-    //printf("Loaded %zu bytes from %s\n", bytes_read, path);
-    //printf("First instruction: 0x%08x\n", memory[0]);  // 调试
+
 }
-// 存储器读取函数
+
 extern "C" int pmem_read(int raddr) {
     // ----------MMIO-----------
     if(raddr == KEYBOARD_ADDR)
@@ -79,24 +78,15 @@ extern "C" int pmem_read(int raddr) {
     }else if(raddr == RTC_ADDR + 4){
         return (uint32_t) (nowtime >> 32);
     }
-    // if (raddr == 0x80000000) {
-    //     printf("First instruction: 0x%08x\n", memory[0]);
-    // }
-    //打印的信息仅用于调试
-    // printf("[pmem_read] 传入的原始地址: 0x%08x\n", raddr);
+
     raddr = raddr - MEM_BASE;
-    // printf("[pmem_read] 减去 MEM_BASE(0x%08x) 后的偏移量: 0x%08x\n", MEM_BASE, raddr);
+
     // 添加边界检查
     if (raddr < 0 || raddr >= MEM_SIZE) {
         //printf("ERROR: pmem_read out of bounds (0x%08x)\n", raddr);
         return 0;
     }
-    // if(raddr == 48)
-    // {
-    //     printf("hello\n");
-    // }
-    
-    // 对齐地址到字边界
+
     uint32_t aligned_addr = raddr & ~0x3; 
     #ifdef CONFIG_MTACE 
     printf("[MTRACE] 0x%08x: READ -> 0x08x\n",raddr+MEM_BASE,memory[aligned_addr>>2]);
@@ -121,25 +111,23 @@ extern "C" void pmem_write(int waddr, int wdata, int wmask_int) {
     if (waddr == SERIAL_PORT) {
         skip_ref_inst = skip_ref_inst +1;
         char ch = (char)(wdata & 0xFF);
-        putchar(ch);   // 或者 printf("%c", ch);
+        putchar(ch);   
         fflush(stdout);
-        //printf("[DEBUG] SERIAL WRITE: 0x%02x -> '%c'\n", wdata & 0xFF, ch);
+        
         return;
     }
     uint8_t wmask = wmask_int & 0xF;
     waddr = waddr - MEM_BASE;
-    uint32_t aligned_addr = waddr & ~0x3;//将地址的最低2位强制设为0，实现向下取整到最近的4字节边界。
+    uint32_t aligned_addr = waddr & ~0x3;
     uint32_t index = aligned_addr >> 2;
-    // printf("C++ pmem_write called: waddr=0x%08x, wdata=0x%08x, wmask_int=0x%08x, wmask=0x%x\n", 
-    //    waddr, wdata, wmask_int, wmask);
-    // 检查地址是否在有效范围内
+
     if (index >= MEM_SIZE / 4) {
 
         return;
     }
 
     uint8_t* mem_byte = (uint8_t*)&memory[index];
-    //uint8_t wmask = wmask_byte & 0xF;  // 只取低4位有效
+    
 
     // 应用字节掩码
     if (wmask & 0x1) mem_byte[0] = wdata & 0xFF;
