@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "../../Config/auto.conf.h"
-//#define CONFIG_BATCH_MODE 1
+
 void cpu_exec(uint64_t n);
 #ifdef CONFIG_BATCH_MODE
     static int is_batch_mode = true;

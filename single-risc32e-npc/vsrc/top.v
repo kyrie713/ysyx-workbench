@@ -13,7 +13,21 @@ module top(
     output [31:0] csr_mcause,
     output [31:0] csr_mepc,
     output [31:0] csr_mstatus,
-    output I_ecall
+    output I_ecall,
+    // 新增：调试寄存器输出
+    output [31:0] debug_zero,
+    output [31:0] debug_ra,
+    output [31:0] debug_sp,
+    output [31:0] debug_gp,
+    output [31:0] debug_tp,
+    output [31:0] debug_s0,
+    output [31:0] debug_s1,
+    output [31:0] debug_a0,
+    output [31:0] debug_a1,
+    output [31:0] debug_a2,
+    output [31:0] debug_a3,
+    output [31:0] debug_a4,
+    output [31:0] debug_a5
 );
 // 定义内部信号
     wire [31:0] PC_plus_4;
@@ -91,7 +105,7 @@ module top(
     wire [4:0] shamt;
     // 指令存储器接口
     import "DPI-C" function int pmem_read(input int raddr);
-    //assign inst = pmem_read(PC);//问题就是出现在这里，先读出来的值是地址为0的内存块的值
+    assign inst = pmem_read(PC);//问题就是出现在这里，先读出来的值是地址为0的内存块的值
     // always @(*) begin
     //     $display("PC :0x%08x",PC);
     // end
@@ -149,10 +163,7 @@ module top(
         .PC_plus_4(PC_plus_4),
         .next_pc(next_pc)
     );
-    IFU ifu(
-        .PC(PC),
-        .inst(inst)
-    );
+
     IDU idu(
         .inst(inst),
         .R_TYPE(R_TYPE),
@@ -234,7 +245,21 @@ module top(
         .raddr_1(r1),
         .raddr_2(r2),
         .rdata_1(R1_data),
-        .rdata_2(R2_data)
+        .rdata_2(R2_data),
+        // 连接调试寄存器输出
+        .zero(debug_zero),
+        .ra(debug_ra),
+        .sp(debug_sp),
+        .gp(debug_gp),
+        .tp(debug_tp),
+        .s0(debug_s0),
+        .s1(debug_s1),
+        .a0(debug_a0),
+        .a1(debug_a1),
+        .a2(debug_a2),
+        .a3(debug_a3),
+        .a4(debug_a4),
+        .a5(debug_a5)
     );
 
     ALU alu (
