@@ -46,6 +46,7 @@ module ALU(
     input [31:0] inst,
     input [31:0] imm,
     input [31:0] pc,
+    input [31:0] ifu_raddr,
     output reg [31:0] csr_wdata,
     output reg [31:0] ALU_OUT
 );
@@ -66,9 +67,11 @@ module ALU(
         if (R_TYPE || I_TYPE || S_TYPE) begin
             A = rdata_1;
         end
-        else if (J_jal ||B_TYPE ||U_auipc) begin 
+        else if (J_jal || B_TYPE ||U_auipc) begin 
             A = pc;
+            //A = ifu_raddr;
         end
+
         else if (U_lui) begin 
             A = 32'b0;
         end

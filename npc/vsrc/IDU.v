@@ -1,5 +1,6 @@
 module IDU(
   input [31:0] inst,
+  input ifu_valid,
   output reg R_TYPE,
   output reg I_TYPE_ARITH,
   output reg L_TYPE_LOAD,
@@ -126,6 +127,7 @@ module IDU(
     shamt = r2;
     // $display("inst: %b", inst);
     // $display("opcode: %b", opcode);
+    // if(ifu_valid == 1) begin
     case (opcode)
         //R_type指令 (add)
         7'b0110011:begin 
@@ -268,6 +270,7 @@ module IDU(
              //I_ebreak = 1;//$display("Unknown opcode: %d", opcode);
         end 
     endcase
+    // end
     //$display("addi_TYPE: %b", I_add);//调试
     I_TYPE = I_addi | L_TYPE_LOAD | I_jalr|I_sltiu|I_srai|I_xori|I_andi|I_srli|I_slli|I_ori;
     U_TYPE = U_lui | U_auipc;

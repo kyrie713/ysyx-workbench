@@ -27,6 +27,7 @@ image: image-dep
 	@echo + OBJCOPY "->" $(IMAGE_REL).bin mainargs=$(mainargs)
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
+#NPC_BIN ?= /home/huang/ysyx-workbench/before_rebuild_npc/build/top
 NPC_BIN ?= /home/huang/ysyx-workbench/npc/build/top
 run: insert-arg
 	$(NPC_BIN) $(IMAGE).bin

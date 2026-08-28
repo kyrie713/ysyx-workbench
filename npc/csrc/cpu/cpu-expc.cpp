@@ -95,7 +95,7 @@ static void exec_once(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
 
     top->clk = 0;top->eval();contextp->timeInc(1);tfp->dump(contextp->time());    
     top->clk = 1;top->eval();contextp->timeInc(1);tfp->dump(contextp->time());
-    cpu.pc = top->PC;\
+    cpu.pc = top->PC;
     cpu_dnpc = top->next_pc;
     for(int i = 0; i < 32; i++){
     cpu.gpr[i] = top->rootp->top__DOT__regfile__DOT__rf[i];
@@ -149,15 +149,15 @@ static void execute(uint64_t n) {
         g_nr_guest_inst ++;
         #ifdef CONFIG_DIFFTEST
         bool skip = false;
-        if(top->do_memread && top->mem_addr == 0xa0000048)
+        if(top->lsu_ren && top->lsu_raddr == 0xa0000048)
         { 
           skip = true;
         }
-        else if(top->do_memread && top->mem_addr == 0xa000004C)
+        else if(top->lsu_ren && top->lsu_raddr == 0xa000004C)
         {
           skip = true;
         }
-        else if(top->MemWEn && top->mem_addr == 0xa0000038)
+        else if(top->lsu_wen && top->lsu_waddr == 0xa0000038)
         {
           skip = true;
         }

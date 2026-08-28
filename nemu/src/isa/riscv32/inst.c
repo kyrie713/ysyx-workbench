@@ -18,7 +18,7 @@
 #include <cpu/ifetch.h>
 #include <cpu/decode.h>
 //#define CONFIG_ERTACE
-//#define CONFIG_FTRACE 1
+#define CONFIG_FTRACE 1
 #define R(i) gpr(i)
 #define Mr vaddr_read
 #define Mw vaddr_write

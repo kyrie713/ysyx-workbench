@@ -4,9 +4,8 @@ module top(
     output [31:0] PC,
     output [31:0] next_pc,
     output [31:0] inst,
-    output logic do_memread,
-    output logic MemWEn,
-    output logic [31:0] mem_addr,
+    // output logic lsu_wen,
+    // output logic [31:0] lsu_addr,
     output logic [31:0] MemWriteData,
     output logic [31:0] MemReadData,
     output [31:0] csr_mtvec,
@@ -27,17 +26,24 @@ module top(
     //wire [31:0] MemReadData;
     wire [31:0] RegWriteData;
     //wire [31:0] MemWriteData;
-    wire [31:0] MemReadDataoneword;
     // wire [31:0] csr_mtvec;
     // wire [31:0] csr_mcause;
     // wire [31:0] csr_mepc;
     // wire [31:0] csr_mstatus;
+    wire MemWEn;
     wire Reg_WE;
     wire I_jalr;
     wire [4:0] r1;
     wire [4:0] r2;
     wire [4:0] rd;
     wire [31:0] imm;
+
+    //wire [31:0] lsu_raddr;
+    wire [31:0] lsu_rdata;
+    //wire lsu_ren;
+    //wire [31:0] lsu_waddr;
+    wire [31:0] lsu_wdata;
+    //wire lsu_wen;
     wire R_TYPE;
     wire I_TYPE_ARITH;
     wire L_TYPE_LOAD;
@@ -87,34 +93,33 @@ module top(
     wire S_sb;
     wire I_ebreak;
     //wire I_ecall;
-    wire [3:0] wmask;
+    wire [3:0] lsu_wmask;
     wire [4:0] shamt;
-    // 指令存储器接口
-    import "DPI-C" function int pmem_read(input int raddr);
-    //assign inst = pmem_read(PC);//问题就是出现在这里，先读出来的值是地址为0的内存块的值
-    // always @(*) begin
-    //     $display("PC :0x%08x",PC);
-    // end
-    // 数据存储器接口
-    //reg [31:0] MemReadData;
-    assign mem_addr = ALU_OUT;
-    assign do_memread = l_lw | l_lbu | l_lh | l_lhu |l_lb;
-    assign MemReadData = do_memread ? pmem_read(mem_addr) : 32'b0;
-    //     $display("0x%08x\n",MemReadData);
-    //     $display("ALU_OUT = 0x%08x\n",ALU_OUT);
-    // end
-    // DPI-C写函数
-    import "DPI-C" function void pmem_write(
-        input int waddr, input int wdata, input int wmask);
-    
-    // 存储器写操作（时钟同步）
-    always @(posedge clk) begin
-        if (MemWEn) begin
-            // $display("Verilog: Writing to addr=0x%08x, data=0x%08x, mask=0x%x", 
-            //     mem_addr, MemWriteData, wmask);
-            pmem_write(mem_addr, MemWriteData,  {28'b0, wmask});
-        end
-    end
+
+    wire alu_ready;
+    wire ifu_valid;
+    wire idu_valid;
+    wire idu_ready;
+    wire ifu_reqValid;
+    wire ifu_respValid;
+    wire ifu_respReady;
+    wire ifu_reqReady;
+    wire [31:0] ifu_raddr;
+    wire [31:0] ifu_rdata;
+    wire ifu_done;
+    wire [31:0] inst_pc;
+
+    wire lsu_reqValid;
+    wire lsu_reqReady;
+    wire lsu_respValid;
+    wire lsu_respReady;
+    wire lsu_busy;
+    wire [31:0] lsu_addr;
+    wire [31:0] lsu_wdata;
+    wire [31:0] lsu_rdata;
+    wire [3:0] lsu_wmask; 
+    wire lsu_wen;
+    wire [31:0] load_result;
 
     import "DPI-C" function void notify_ebreak();
     
@@ -124,11 +129,31 @@ module top(
             notify_ebreak();
         end
     end
-    // always@(*)begin 
-    //     if(inst == 32'h0ff57513) begin
-    //         $display("I_addi = %d\n",I_addi);
-    //     end
-    // end
+
+
+
+    RAM ram(
+        .clk(clk),
+        .rst(rst),
+        .ifu_reqValid(ifu_reqValid),
+        .ifu_reqReady(ifu_reqReady),
+        .ifu_raddr(ifu_raddr),
+        .ifu_respValid(ifu_respValid),
+        .ifu_respReady(ifu_respReady),
+        .ifu_rdata(ifu_rdata),
+        .lsu_reqValid(lsu_reqValid),
+        .lsu_reqReady(lsu_reqReady),
+        .lsu_addr(lsu_addr),
+        .lsu_wen(lsu_wen),
+        .lsu_wdata(lsu_wdata),
+        .lsu_wmask(lsu_wmask),
+        .lsu_respValid(lsu_respValid),
+        .lsu_respReady(lsu_respReady),
+        .lsu_rdata(lsu_rdata)
+    );
+
+
+
     PC pc(
         .I_jalr(I_jalr),
         .J_jal(J_jal),
@@ -143,18 +168,40 @@ module top(
         .B_bltu(B_bltu),
         .B_blt(B_blt),
         .ALU_OUT(ALU_OUT),
+        .ifu_done(ifu_done),
         .clk(clk),
         .rst(rst),
         .PC(PC),
-        .PC_plus_4(PC_plus_4),
         .next_pc(next_pc)
     );
     IFU ifu(
+        .clk(clk),
+        .rst(rst),
         .PC(PC),
+        .lsu_busy(lsu_busy),
+        .ifu_raddr(ifu_raddr),
+        .ifu_rdata(ifu_rdata),
+        .ifu_reqValid(ifu_reqValid),
+        .ifu_reqReady(ifu_reqReady),
+        .ifu_respReady(ifu_respReady),
+        .ifu_respValid(ifu_respValid),
+        .ifu_done(ifu_done),
+        .ifu_valid(ifu_valid),
+        .inst_pc(inst_pc),
         .inst(inst)
     );
     IDU idu(
         .inst(inst),
+        // .clk(clk),
+        // .rst(rst),
+
+        .ifu_valid(ifu_valid),
+        // .alu_ready(alu_ready),
+      
+        // .idu_valid(idu_valid),
+        // .idu_ready(idu_ready),
+
+
         .R_TYPE(R_TYPE),
         .I_TYPE_ARITH(I_TYPE_ARITH),
         .L_TYPE_LOAD(L_TYPE_LOAD),
@@ -214,15 +261,33 @@ module top(
     );
 
     LSU lsu (
-        .MemReadData(MemReadData),
+        //.MemReadData(MemReadData),
+        .clk(clk),
+        .rst(rst),
+        .ifu_done(ifu_done),
         .R2_data(R2_data),
         .ALU_OUT(ALU_OUT),
         .S_sb(S_sb),
         .S_sw(S_sw),
         .S_sh(S_sh),
-        .MemWriteData(MemWriteData),
-        .MemReadDataoneword(MemReadDataoneword),
-        .wmask(wmask)
+        .l_lb(l_lb),
+        .l_lbu(l_lbu),
+        .l_lh(l_lh),
+        .l_lhu(l_lhu),
+        .l_lw(l_lw),
+        .MemWEn(MemWEn),
+        .lsu_addr(lsu_addr),
+        .lsu_rdata(lsu_rdata),
+        .lsu_wen(lsu_wen),
+        .lsu_wdata(lsu_wdata),
+        .lsu_busy(lsu_busy),
+        .lsu_respValid(lsu_respValid),
+        .lsu_respReady(lsu_respReady),
+        .lsu_reqValid(lsu_reqValid),
+        .lsu_reqReady(lsu_reqReady),
+        .load_result(load_result),
+        //.MemWriteData(MemWriteData),
+        .lsu_wmask(lsu_wmask)
     );
 
     RegisterFile  regfile (
@@ -284,6 +349,7 @@ module top(
         .rdata_2(R2_data),
         .inst(inst),
         .imm(imm),
+        .ifu_raddr(ifu_raddr),
         .pc(PC),
         .csr_wdata(csr_wdata),
         .ALU_OUT(ALU_OUT)
@@ -292,8 +358,10 @@ module top(
     WBU wbu(
     .MemReadData(MemReadData),
     .ALU_OUT(ALU_OUT),
-    .PC_plus_4(PC_plus_4),
+    .ifu_done(ifu_done),
+    .PC(PC),
     .csr_rdata(csr_rdata),
+    .mtvec(csr_mtvec),
     .l_lbu(l_lbu),
     .l_lw(l_lw),
     .l_lh(l_lh),
@@ -312,11 +380,21 @@ module top(
     .U_auipc(U_auipc),
     .U_lui(U_lui),
     .J_jal(J_jal),
+    .B_bne(B_bne),
+    .B_bge(B_bge),
+    .B_beq(B_beq),
+    .B_bgeu(B_bgeu),
+    .B_blt(B_blt),
+    .B_bltu(B_bltu),
+    .I_ecall(I_ecall),
+    .I_mret(I_mret),
     .R_TYPE(R_TYPE),
     .I_TYPE_ARITH(I_TYPE_ARITH),
     .I_TYPE(I_TYPE),
     .U_TYPE(U_TYPE),
     .J_TYPE(J_TYPE),
+    .load_result(load_result),
+    .next_pc(next_pc),
     .RegWriteData(RegWriteData),
     .Reg_WE(Reg_WE)
     );
