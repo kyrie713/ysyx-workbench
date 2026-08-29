@@ -17,6 +17,7 @@
 //#define ENABLE_WAVEFORM
 
 uint64_t g_timer = 0;
+uint64_t g_nr_guest_cycle = 0;
 
 
 extern Vtop* top;
@@ -72,12 +73,14 @@ static void ftrace(){
 #ifdef CONFIG_WAVEFORM
 #include "verilated_vcd_c.h"
 extern VerilatedVcdC* tfp;
-static void exec_once(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
+static bool exec_once(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
+    bool commit_valid = top->inst_valid;
     // cpu.inst = top->inst;
     #ifdef CONFIG_FTRACE
-    ftrace();
+    if (commit_valid) ftrace();
     #endif
     #ifdef CONFIG_ITRACE 
+      if (commit_valid) {
         char disasm_output [128];
         uint32_t inst = top->inst;
         uint8_t code[4];
@@ -91,6 +94,7 @@ static void exec_once(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
         fflush(itrace_fp);   /* 强制把缓冲区刷到磁盘，先调试用 */
         //printf("[itrace] write pc=0x%08x\n", top->PC);  /* 终端能看到就说明确实执行了 */
         //log_mem_access(top);
+      }
     #endif
 
     top->clk = 0;top->eval();contextp->timeInc(1);tfp->dump(contextp->time());    
@@ -98,18 +102,21 @@ static void exec_once(Vtop* top,VerilatedContext* contextp,VerilatedVcdC* tfp){
     cpu.pc = top->PC;
     cpu_dnpc = top->next_pc;
     for(int i = 0; i < 32; i++){
-    cpu.gpr[i] = top->rootp->top__DOT__regfile__DOT__rf[i];
+    cpu.gpr[i] = top->rootp->top__DOT__wbu__DOT__regfile__DOT__rf[i];
     }
+    return commit_valid;
 }
 #else
-static void exec_once(Vtop* top,VerilatedContext* contextp){
+static bool exec_once(Vtop* top,VerilatedContext* contextp){
+    bool commit_valid = top->inst_valid;
     // cpu.pc = top->PC;
     // cpu_dnpc = top->next_pc;
     // cpu.inst = top->inst;  
     #ifdef CONFIG_FTRACE  
-    ftrace();
+    if (commit_valid) ftrace();
     #endif
     #ifdef CONFIG_ITRACE 
+      if (commit_valid) {
         char disasm_output [256];
         uint32_t inst = top->inst;
         uint8_t code[4];
@@ -123,57 +130,65 @@ static void exec_once(Vtop* top,VerilatedContext* contextp){
         fflush(itrace_fp);   /* 强制把缓冲区刷到磁盘，先调试用 */
         //printf("[itrace] write pc=0x%08x\n", top->PC);  /* 终端能看到就说明确实执行了 */
         //log_mem_access(top);
+      }
     #endif
     top->clk = 0;top->eval();contextp->timeInc(1);
     top->clk = 1;top->eval();contextp->timeInc(1);
     cpu.pc = top->PC;
     cpu_dnpc = top->next_pc;
     for(int i = 0; i < 32; i++){
-    cpu.gpr[i] = top->rootp->top__DOT__regfile__DOT__rf[i];
+    cpu.gpr[i] = top->rootp->top__DOT__wbu__DOT__regfile__DOT__rf[i];
     }
     //printf("0x%08x: 0x%08x\n", cpu.pc, cpu.inst);
-    cpu.mstatus = top->csr_mstatus;
-    cpu.mcause  = top->csr_mcause;
-    cpu.mepc    = top->csr_mepc;
-    cpu.mtvec   = top->csr_mtvec;
+    //下面几行只有在有csr的时候才开启
+    // cpu.mstatus = top->csr_mstatus;
+    // cpu.mcause  = top->csr_mcause;
+    // cpu.mepc    = top->csr_mepc;
+    // cpu.mtvec   = top->csr_mtvec;
+    return commit_valid;
 }//npc_state.state == NPC_RUNNING || 
 #endif
 static void execute(uint64_t n) {
-    for (;n > 0; n --) {
+    while (n > 0) {
         #ifdef CONFIG_WAVEFORM 
-            exec_once(top,contextp,tfp);
+            bool commit_valid = exec_once(top,contextp,tfp);
         #else 
-            exec_once(top,contextp);
+            bool commit_valid = exec_once(top,contextp);
         #endif
-        
-        g_nr_guest_inst ++;
+
+        g_nr_guest_cycle ++;
+
+        if (commit_valid) {
+          n --;
+          g_nr_guest_inst ++;
         #ifdef CONFIG_DIFFTEST
-        bool skip = false;
-        if(top->lsu_ren && top->lsu_raddr == 0xa0000048)
-        { 
-          skip = true;
-        }
-        else if(top->lsu_ren && top->lsu_raddr == 0xa000004C)
-        {
-          skip = true;
-        }
-        else if(top->lsu_wen && top->lsu_waddr == 0xa0000038)
-        {
-          skip = true;
-        }
-        // } else if(top->I_ecall)
-        // {
+          bool skip = false;
+          if(top->lsu_ren && top->lsu_raddr == 0xa0000048)
+          {
+            skip = true;
+          }
+          else if(top->lsu_ren && top->lsu_raddr == 0xa000004C)
+          {
+            skip = true;
+          }
+          else if(top->lsu_wen && top->lsu_waddr == 0xa0000038)
+          {
+            skip = true;
+          }
+          // } else if(top->I_ecall)
+          // {
 
-        //   skip = true;
-        // }
+          //   skip = true;
+          // }
 
-        if (skip) {
-            difftest_skip_ref();  
-        }
-        else {
-            difftest(cpu.pc, cpu_dnpc);   // 正常 diff
-        }
+          if (skip) {
+              difftest_skip_ref();
+          }
+          else {
+              difftest(cpu.pc, cpu_dnpc);   // 正常 diff
+          }
         #endif
+        }
         #ifdef CONFIG_DEVICE 
           device_update();
         #endif
@@ -184,7 +199,11 @@ static void statistic() {
   setlocale(LC_NUMERIC, "");
   #define NPCBERIC_FMT "%'" PRIu64
   Log("host time spent = " NPCBERIC_FMT " us", g_timer);
+  Log("total guest cycles = " NPCBERIC_FMT, g_nr_guest_cycle);
   Log("total guest instructions = " NPCBERIC_FMT, g_nr_guest_inst);
+  if (g_nr_guest_cycle > 0) {
+    Log("IPC = %.6f", (double)g_nr_guest_inst / g_nr_guest_cycle);
+  }
   if (g_timer > 0) Log("simulation frequency = " NPCBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 }    
@@ -233,4 +252,3 @@ void cpu_exec(uint64_t n) {
     //     printf("\033[34m[%s:%d %s] npc:\033[0m  \033[1;31mHIT BAD TRAP\033[0m at pc = 0x%08x\n",
     //            __FILE__, __LINE__, __func__, npc_state.halt_pc);
     // }
-

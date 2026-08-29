@@ -21,10 +21,11 @@ void scan_registers(){
     for(int i =0;i<32;i++)
     {   
         //printf("HELLOP\n");
-        printf("%s\t\t0x%08x\n",regs[i],top->rootp->top__DOT__regfile__DOT__rf[i]);
+        printf("%s\t\t0x%08x\n",regs[i],top->rootp->top__DOT__wbu__DOT__regfile__DOT__rf[i]);
     }
-    printf("mepc\t\t0x%08x\n",top->csr_mepc);
-    printf("mcause\t\t0x%08x\n",top->csr_mcause);
-    printf("mstatus\t\t0x%08x\n",top->csr_mstatus);
-    printf("mtvec\t\t0x%08x\n",top->csr_mtvec);
+    //这两行也是
+    // printf("mepc\t\t0x%08x\n",top->csr_mepc);
+    // printf("mcause\t\t0x%08x\n",top->csr_mcause);
+    // printf("mstatus\t\t0x%08x\n",top->csr_mstatus);
+    // printf("mtvec\t\t0x%08x\n",top->csr_mtvec);
 }

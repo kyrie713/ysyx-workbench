@@ -115,12 +115,13 @@ int main(int argc,char** argv,char** env){
     cpu.pc = top->PC;
     
     for(int i = 0; i < 32; i++){
-    cpu.gpr[i] = top->rootp->top__DOT__regfile__DOT__rf[i];
+    cpu.gpr[i] = top->rootp->top__DOT__wbu__DOT__regfile__DOT__rf[i];
     }
-    cpu.mstatus = top->csr_mstatus;
-    cpu.mcause  = top->csr_mcause;
-    cpu.mepc    = top->csr_mepc;
-    cpu.mtvec   = top->csr_mtvec;
+    //这里也是
+    // cpu.mstatus = top->csr_mstatus;
+    // cpu.mcause  = top->csr_mcause;
+    // cpu.mepc    = top->csr_mepc;
+    // cpu.mtvec   = top->csr_mtvec;
     char ref_so_file[] = "/home/huang/ysyx-workbench/nemu/build/riscv32-nemu-interpreter-so";
     init_difftest(ref_so_file,img_size, difftest_port);
 
