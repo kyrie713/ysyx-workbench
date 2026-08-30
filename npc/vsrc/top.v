@@ -1,4 +1,13 @@
-module top(
+module top #(
+    parameter integer IFU_MEM_LATENCY = 30,
+    parameter integer LSU_MEM_LATENCY = 1,
+    parameter integer IFU_MEM_RANDOM_DELAY = 0,
+    parameter integer LSU_MEM_RANDOM_DELAY = 0,
+    parameter integer IFU_RANDOM_REQ_DELAY = 0,
+    parameter integer LSU_RANDOM_REQ_DELAY = 0,
+    parameter integer MAX_MEM_LATENCY = 20,
+    parameter integer MAX_REQ_DELAY = 3
+)(
     input clk,
     input rst,
     output [31:0] PC,
@@ -13,7 +22,11 @@ module top(
     output [31:0] lsu_raddr,
     output lsu_wen,
     output [31:0] lsu_waddr,
+    output lsu_reqValid,
+    output reg lsu_respValid,
     output [31:0] ifu_raddr,
+    output ifu_reqValid,
+    output reg ifu_respValid,
     output reg [31:0] ifu_rdata,
     output inst_valid,
     output reg [31:0] lsu_rdata,
@@ -50,25 +63,65 @@ module top(
     wire S_sw;
     wire S_sb;
     wire I_ebreak;
-    wire [3:0] wmask;
     wire [31:0] decode_inst;
     wire ifu_valid;
-    wire lsu_req;
     wire lsu_done;
     wire commit_valid;
+    wire lsu_reqValid_int;
+    wire ifu_reqValid_int;
+    reg ifu_pending;
+    reg [31:0] ifu_pending_addr;
+    integer ifu_delay_count;
+    reg [15:0] ifu_lfsr;
+    reg lsu_pending;
+    reg lsu_pending_wen;
+    reg [31:0] lsu_pending_addr;
+    reg [31:0] lsu_pending_wdata;
+    reg [3:0] lsu_pending_wmask;
+    integer lsu_delay_count;
+    reg [15:0] lsu_lfsr;
+
+    function [15:0] lfsr_next;
+        input [15:0] value;
+        begin
+            lfsr_next = {value[14:0],
+                         value[15] ^ value[13] ^ value[12] ^ value[10]};
+        end
+    endfunction
+
+    function integer selected_latency;
+        input integer value;
+        input integer fixed_latency;
+        input integer random_enable;
+        begin
+            if (random_enable != 0) begin
+                if (MAX_MEM_LATENCY <= 1) begin
+                    selected_latency = 1;
+                end else begin
+                    selected_latency = 1 + (value % MAX_MEM_LATENCY);
+                end
+            end else if (fixed_latency <= 1) begin
+                selected_latency = 1;
+            end else begin
+                selected_latency = fixed_latency;
+            end
+        end
+    endfunction
 
     assign decode_inst = ifu_valid ? inst : 32'b0;
-    assign commit_valid = ifu_valid && (!L_TYPE_LOAD || lsu_done);
+    assign commit_valid = ifu_valid && (!(L_TYPE_LOAD || S_TYPE) || lsu_done);
     assign inst_valid = commit_valid;
 
     assign mem_addr = lsu_addr;
     assign MemWriteData = lsu_wdata;
     assign MemWEn = lsu_wen;
-    assign lsu_ren = lsu_req && !lsu_wen;
+    assign lsu_ren = lsu_reqValid && !lsu_wen;
     assign lsu_raddr = lsu_addr;
     assign lsu_waddr = lsu_addr;
     assign MemReadData = lsu_rdata;
     assign do_memread = lsu_ren;
+    assign lsu_reqValid = lsu_reqValid_int;
+    assign ifu_reqValid = ifu_reqValid_int;
 
     import "DPI-C" function void notify_ebreak();
     import "DPI-C" function int pmem_read(input int raddr);
@@ -78,19 +131,86 @@ module top(
     always @(posedge clk) begin
         if (rst) begin
             ifu_rdata <= 32'b0;
+            ifu_respValid <= 1'b0;
+            ifu_pending <= 1'b0;
+            ifu_pending_addr <= 32'b0;
+            ifu_delay_count <= 0;
+            ifu_lfsr <= 16'h1;
         end else begin
-            ifu_rdata <= pmem_read(ifu_raddr);
+            ifu_respValid <= 1'b0;
+            if (ifu_pending) begin
+                if (ifu_delay_count == 0) begin
+                    ifu_rdata <= pmem_read(ifu_pending_addr);
+                    ifu_respValid <= 1'b1;
+                    ifu_pending <= 1'b0;
+                end else begin
+                    ifu_delay_count <= ifu_delay_count - 1;
+                end
+            end else if (ifu_reqValid_int) begin
+                if (selected_latency({16'b0, ifu_lfsr}, IFU_MEM_LATENCY,
+                                    IFU_MEM_RANDOM_DELAY) <= 1) begin
+                    ifu_rdata <= pmem_read(ifu_raddr);
+                    ifu_respValid <= 1'b1;
+                end else begin
+                    ifu_pending <= 1'b1;
+                    ifu_pending_addr <= ifu_raddr;
+                    ifu_delay_count <= selected_latency(
+                        {16'b0, ifu_lfsr}, IFU_MEM_LATENCY,
+                        IFU_MEM_RANDOM_DELAY) - 2;
+                end
+                ifu_lfsr <= lfsr_next(ifu_lfsr);
+            end
         end
     end
 
-    // 数据存储器采用固定 1 周期返回：load 在请求沿采样数据，store 在请求沿写入。
+    // 数据存储器只在 reqValid 有效时接受请求，并在延迟结束后产生 respValid。
     always @(posedge clk) begin
         if (rst) begin
             lsu_rdata <= 32'b0;
+            lsu_respValid <= 1'b0;
+            lsu_pending <= 1'b0;
+            lsu_pending_wen <= 1'b0;
+            lsu_pending_addr <= 32'b0;
+            lsu_pending_wdata <= 32'b0;
+            lsu_pending_wmask <= 4'b0;
+            lsu_delay_count <= 0;
+            lsu_lfsr <= 16'h1;
         end else begin
-            lsu_rdata <= (lsu_req && !lsu_wen) ? pmem_read(lsu_addr) : 32'b0;
-            if (lsu_req && lsu_wen) begin
-                pmem_write(lsu_addr, lsu_wdata, {28'b0, lsu_wmask});
+            lsu_respValid <= 1'b0;
+            lsu_rdata <= 32'b0;
+            if (lsu_pending) begin
+                if (lsu_delay_count == 0) begin
+                    if (lsu_pending_wen) begin
+                        pmem_write(lsu_pending_addr, lsu_pending_wdata,
+                                  {28'b0, lsu_pending_wmask});
+                    end else begin
+                        lsu_rdata <= pmem_read(lsu_pending_addr);
+                    end
+                    lsu_respValid <= 1'b1;
+                    lsu_pending <= 1'b0;
+                end else begin
+                    lsu_delay_count <= lsu_delay_count - 1;
+                end
+            end else if (lsu_reqValid_int) begin
+                if (selected_latency({16'b0, lsu_lfsr}, LSU_MEM_LATENCY,
+                                    LSU_MEM_RANDOM_DELAY) <= 1) begin
+                    if (lsu_wen) begin
+                        pmem_write(lsu_addr, lsu_wdata, {28'b0, lsu_wmask});
+                    end else begin
+                        lsu_rdata <= pmem_read(lsu_addr);
+                    end
+                    lsu_respValid <= 1'b1;
+                end else begin
+                    lsu_pending <= 1'b1;
+                    lsu_pending_wen <= lsu_wen;
+                    lsu_pending_addr <= lsu_addr;
+                    lsu_pending_wdata <= lsu_wdata;
+                    lsu_pending_wmask <= lsu_wmask;
+                    lsu_delay_count <= selected_latency(
+                        {16'b0, lsu_lfsr}, LSU_MEM_LATENCY,
+                        LSU_MEM_RANDOM_DELAY) - 2;
+                end
+                lsu_lfsr <= lfsr_next(lsu_lfsr);
             end
         end
     end
@@ -102,12 +222,17 @@ module top(
         end
     end
 
-    IFU ifu(
+    IFU #(
+        .RANDOM_REQ_DELAY(IFU_RANDOM_REQ_DELAY),
+        .MAX_REQ_DELAY(MAX_REQ_DELAY)
+    ) ifu(
         .clk(clk),
         .rst(rst),
         .pc(PC),
-        .ifu_rdata(ifu_rdata),
+        .ifu_reqValid(ifu_reqValid_int),
         .ifu_raddr(ifu_raddr),
+        .ifu_respValid(ifu_respValid),
+        .ifu_rdata(ifu_rdata),
         .inst(inst),
         .inst_valid(ifu_valid),
         .inst_done(commit_valid)
@@ -139,7 +264,10 @@ module top(
         .rd(rd)
     );
 
-    LSU lsu (
+    LSU #(
+        .RANDOM_REQ_DELAY(LSU_RANDOM_REQ_DELAY),
+        .MAX_REQ_DELAY(MAX_REQ_DELAY)
+    ) lsu (
         .clk(clk),
         .rst(rst),
         .inst_valid(ifu_valid),
@@ -149,12 +277,13 @@ module top(
         .l_lbu(l_lbu),
         .S_sb(S_sb),
         .S_sw(S_sw),
-        .lsu_rdata(lsu_rdata),
+        .lsu_reqValid(lsu_reqValid_int),
         .lsu_addr(lsu_addr),
-        .lsu_req(lsu_req),
         .lsu_wen(lsu_wen),
         .lsu_wdata(lsu_wdata),
         .lsu_wmask(lsu_wmask),
+        .lsu_respValid(lsu_respValid),
+        .lsu_rdata(lsu_rdata),
         .load_data(load_data),
         .lsu_done(lsu_done)
     );

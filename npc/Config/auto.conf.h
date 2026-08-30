@@ -1,2 +1,2 @@
 // Auto generated header
-#define CONFIG_DIFFTEST 1
+#define CONFIG_WAVEFORM 1

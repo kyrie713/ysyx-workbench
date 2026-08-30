@@ -6,6 +6,24 @@ VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build --cc --trace  \
 				-O3 --x-assign fast --x-initial fast --noassert
 
+# SimpleBus 延迟测试参数，可在 make 命令行覆盖。
+IFU_MEM_LATENCY ?= 1
+LSU_MEM_LATENCY ?= 1
+IFU_MEM_RANDOM_DELAY ?= 0
+LSU_MEM_RANDOM_DELAY ?= 0
+IFU_RANDOM_REQ_DELAY ?= 0
+LSU_RANDOM_REQ_DELAY ?= 0
+MAX_MEM_LATENCY ?= 20
+MAX_REQ_DELAY ?= 3
+VERILATOR_CFLAGS += -GIFU_MEM_LATENCY=$(IFU_MEM_LATENCY) \
+				-GLSU_MEM_LATENCY=$(LSU_MEM_LATENCY) \
+				-GIFU_MEM_RANDOM_DELAY=$(IFU_MEM_RANDOM_DELAY) \
+				-GLSU_MEM_RANDOM_DELAY=$(LSU_MEM_RANDOM_DELAY) \
+				-GIFU_RANDOM_REQ_DELAY=$(IFU_RANDOM_REQ_DELAY) \
+				-GLSU_RANDOM_REQ_DELAY=$(LSU_RANDOM_REQ_DELAY) \
+				-GMAX_MEM_LATENCY=$(MAX_MEM_LATENCY) \
+				-GMAX_REQ_DELAY=$(MAX_REQ_DELAY)
+
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)   
@@ -69,5 +87,4 @@ clean:
 	rm -rf $(BUILD_DIR) wave.vcd
 
 .PHONY: default all clean  sim  # 添加sim到伪目标列表
-
 
