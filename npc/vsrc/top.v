@@ -15,7 +15,11 @@ module top(
     output [31:0] lsu_waddr,
     output [31:0] ifu_raddr,
     output reg [31:0] ifu_rdata,
-    output inst_valid
+    output inst_valid,
+    output reg [31:0] lsu_rdata,
+    output [31:0] lsu_addr,
+    output [31:0] lsu_wdata,
+    output [3:0] lsu_wmask
 );
     wire [31:0] PC_plus_4;
     wire [31:0] ALU_OUT;
@@ -48,16 +52,28 @@ module top(
     wire I_ebreak;
     wire [3:0] wmask;
     wire [31:0] decode_inst;
+    wire ifu_valid;
+    wire lsu_req;
+    wire lsu_done;
+    wire commit_valid;
 
-    assign decode_inst = inst_valid ? inst : 32'b0;
+    assign decode_inst = ifu_valid ? inst : 32'b0;
+    assign commit_valid = ifu_valid && (!L_TYPE_LOAD || lsu_done);
+    assign inst_valid = commit_valid;
 
-    assign lsu_ren = do_memread;
-    assign lsu_raddr = mem_addr;
-    assign lsu_wen = MemWEn;
-    assign lsu_waddr = mem_addr;
+    assign mem_addr = lsu_addr;
+    assign MemWriteData = lsu_wdata;
+    assign MemWEn = lsu_wen;
+    assign lsu_ren = lsu_req && !lsu_wen;
+    assign lsu_raddr = lsu_addr;
+    assign lsu_waddr = lsu_addr;
+    assign MemReadData = lsu_rdata;
+    assign do_memread = lsu_ren;
 
     import "DPI-C" function void notify_ebreak();
     import "DPI-C" function int pmem_read(input int raddr);
+    import "DPI-C" function void pmem_write(
+        input int waddr, input int wdata, input int wmask);
 
     always @(posedge clk) begin
         if (rst) begin
@@ -66,9 +82,21 @@ module top(
             ifu_rdata <= pmem_read(ifu_raddr);
         end
     end
+
+    // 数据存储器采用固定 1 周期返回：load 在请求沿采样数据，store 在请求沿写入。
+    always @(posedge clk) begin
+        if (rst) begin
+            lsu_rdata <= 32'b0;
+        end else begin
+            lsu_rdata <= (lsu_req && !lsu_wen) ? pmem_read(lsu_addr) : 32'b0;
+            if (lsu_req && lsu_wen) begin
+                pmem_write(lsu_addr, lsu_wdata, {28'b0, lsu_wmask});
+            end
+        end
+    end
     
     always @(posedge clk) begin
-        if(inst_valid && I_ebreak && $time > 0) begin //避免仿真初期误触发
+        if(commit_valid && I_ebreak && $time > 0) begin //避免仿真初期误触发
             $display("[TRAP] EBREAK at PC = 0x%08x",PC);
             notify_ebreak();
         end
@@ -81,7 +109,8 @@ module top(
         .ifu_rdata(ifu_rdata),
         .ifu_raddr(ifu_raddr),
         .inst(inst),
-        .inst_valid(inst_valid)
+        .inst_valid(ifu_valid),
+        .inst_done(commit_valid)
     );
 
     IDU idu(
@@ -112,19 +141,22 @@ module top(
 
     LSU lsu (
         .clk(clk),
+        .rst(rst),
+        .inst_valid(ifu_valid),
         .R2_data(R2_data),
         .ALU_OUT(ALU_OUT),
         .l_lw(l_lw),
         .l_lbu(l_lbu),
         .S_sb(S_sb),
         .S_sw(S_sw),
-        .MemWEn(MemWEn),
-        .mem_addr(mem_addr),
-        .do_memread(do_memread),
-        .MemReadData(MemReadData),
+        .lsu_rdata(lsu_rdata),
+        .lsu_addr(lsu_addr),
+        .lsu_req(lsu_req),
+        .lsu_wen(lsu_wen),
+        .lsu_wdata(lsu_wdata),
+        .lsu_wmask(lsu_wmask),
         .load_data(load_data),
-        .MemWriteData(MemWriteData),
-        .wmask(wmask)
+        .lsu_done(lsu_done)
     );
 
     EXU exu (
@@ -149,7 +181,7 @@ module top(
     WBU wbu (
         .clk(clk),
         .rst(rst),
-        .inst_valid(inst_valid),
+        .inst_valid(commit_valid),
         .ALU_OUT(ALU_OUT),
         .load_data(load_data),
         .R_TYPE(R_TYPE),

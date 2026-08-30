@@ -5,7 +5,8 @@ module IFU(
     input  [31:0] ifu_rdata,
     output [31:0] ifu_raddr,
     output [31:0] inst,
-    output        inst_valid
+    output        inst_valid,
+    input         inst_done
 );
     localparam IDLE = 1'b0;
     localparam WAIT = 1'b1;
@@ -22,7 +23,11 @@ module IFU(
         end else begin
             case (state)
                 IDLE: state <= WAIT;
-                WAIT: state <= IDLE;
+                WAIT: begin
+                    if (inst_done) begin
+                        state <= IDLE;
+                    end
+                end
             endcase
         end
     end
