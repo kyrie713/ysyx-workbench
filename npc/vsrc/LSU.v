@@ -13,6 +13,7 @@ module LSU #(
     input         S_sw,
     output        lsu_reqValid,
     output [31:0] lsu_addr,
+    output [1:0]  lsu_size,
     output        lsu_wen,
     output reg [31:0] lsu_wdata,
     output reg [3:0]  lsu_wmask,
@@ -53,6 +54,8 @@ module LSU #(
     endfunction
 
     assign lsu_addr = ALU_OUT;
+    // SimpleBus size encoding: byte=00, halfword=01, word=10.
+    assign lsu_size = (l_lbu || S_sb) ? 2'b00 : 2'b10;
     assign lsu_reqValid = inst_valid && is_mem && (state == IDLE) &&
                           (req_delay_count == 0);
     assign lsu_wen = lsu_reqValid && is_store;

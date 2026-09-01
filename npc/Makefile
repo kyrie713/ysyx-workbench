@@ -1,4 +1,6 @@
-TOPNAME = top
+SOC ?= 1
+TOPNAME = SimTop
+YSYXSOC_HOME ?= $(abspath ../ysyxSoC)
 # NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
@@ -6,6 +8,23 @@ VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build --cc --trace  \
 				-O3 --x-assign fast --x-initial fast --noassert
 
+ifeq ($(SOC),1)
+TOPNAME = SimTop
+BUILD_DIR ?= ./build-soc
+SOC_IMAGE ?= $(YSYXSOC_HOME)/ready-to-run/minirv/hello-minirv-ysyxsoc.bin
+SOC_RUN_CYCLES ?= 300000000
+
+VERILATOR_CFLAGS += --timescale 1ns/1ns --no-timing -sv \
+				-D__VERILOG__ -DPDK_BEHAV -D__UART_TO_CONSOLE__ \
+				-I$(YSYXSOC_HOME)/perip/uart16550/rtl \
+				-I$(YSYXSOC_HOME)/perip/spi/rtl
+
+SOC_PERIP_VSRCS := $(shell find $(YSYXSOC_HOME)/perip -type f \( -name '*.v' -o -name '*.sv' \))
+VSRCS := $(shell find $(abspath ./vsrc) -name '*.v' ! -name 'top.v') \
+		$(YSYXSOC_HOME)/ready-to-run/minirv/ElaborateTop.v \
+		$(SOC_PERIP_VSRCS)
+CSRCS := $(abspath ./csrc/soc-main.cpp)
+else
 # SimpleBus 延迟测试参数，可在 make 命令行覆盖。
 IFU_MEM_LATENCY ?= 1
 LSU_MEM_LATENCY ?= 1
@@ -24,7 +43,13 @@ VERILATOR_CFLAGS += -GIFU_MEM_LATENCY=$(IFU_MEM_LATENCY) \
 				-GMAX_MEM_LATENCY=$(MAX_MEM_LATENCY) \
 				-GMAX_REQ_DELAY=$(MAX_REQ_DELAY)
 
-BUILD_DIR = ./build
+BUILD_DIR ?= ./build
+
+# project source
+VSRCS := $(shell find $(abspath ./vsrc) -name '*.v')
+CSRCS := $(shell find $(abspath ./csrc) \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) ! -name 'soc-main.cpp')
+endif
+
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)   
 
@@ -33,9 +58,6 @@ default: $(BIN)
 $(shell mkdir -p $(BUILD_DIR))  
 
 
-# project source
-VSRCS = $(shell find $(abspath ./vsrc) -name "*.v") 
-CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp") 
 #CSRCS += $(SRC_AUTO_BIND)
 
 
@@ -43,8 +65,11 @@ CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*
 
 
 INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -I /home/huang/ysyx-workbench/nemu/tools/capstone/repo/include -DTOP_NAME="\"V$(TOPNAME)\""
+CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
+ifeq ($(SOC),0)
+CXXFLAGS += -I /home/huang/ysyx-workbench/nemu/tools/capstone/repo/include
 LDFLAGS += -L /home/huang/ysyx-workbench/nemu/tools/capstone/repo/ -lcapstone -lSDL2 -lSDL2_image -lreadline
+endif
 
 
 # Kconfig 配置
@@ -74,17 +99,25 @@ $(BIN): $(VSRCS) $(CSRCS) $(KCONFIG_HEADER)#$(NVBOARD_ARCHIVE)
 all: default
   
 
-
+ifeq ($(SOC),1)
 sim: $(BIN)
-	@$(call git_commit, "sim RTL") 
+	@$(call git_commit, "sim RTL")
 	@echo "Running simulation with git commit..."
-	./build/top +trace  
+	$(BIN) $(SOC_IMAGE) $(SOC_RUN_CYCLES)
+
+run: $(BIN)
+	$(BIN) $(SOC_IMAGE) $(SOC_RUN_CYCLES)
+else
+sim: $(BIN)
+	@$(call git_commit, "sim RTL")
+	@echo "Running simulation with git commit..."
+	$(BIN) +trace
 
 run: $(BIN)
 	./$(BIN) $(IMAGE) 
+endif
 	
 clean:
 	rm -rf $(BUILD_DIR) wave.vcd
 
 .PHONY: default all clean  sim  # 添加sim到伪目标列表
-

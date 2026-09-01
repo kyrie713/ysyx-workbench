@@ -1,4 +1,6 @@
-module WBU(
+module WBU #(
+    parameter [31:0] RESET_PC = 32'h80000000
+)(
     input clk,
     input rst,
     input inst_valid,
@@ -54,7 +56,7 @@ module WBU(
 
     always @(posedge clk) begin
         if (rst) begin
-            PC <= 32'h80000000;
+            PC <= RESET_PC;
         end else if (inst_valid) begin
             PC <= next_pc;
         end
