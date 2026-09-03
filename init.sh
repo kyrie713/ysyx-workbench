@@ -58,6 +58,15 @@ case $1 in
   nvboard)
     init NJU-ProjectN/nvboard master nvboard false NVBOARD_HOME
     ;;
+  riscv-tests)
+    init NJU-ProjectN/riscv-tests-am master riscv-tests false
+    ;;
+  riscv-arch-test)
+    init NJU-ProjectN/riscv-arch-test-am main riscv-arch-test false
+    ;;
+  archbench)
+    init OSCPU/archbench main archbench false BENCH_HOME
+    ;;
   npc-chisel)
     if [ -d npc/playground ]; then
       echo "chisel repo is already initialized, skipping..."
