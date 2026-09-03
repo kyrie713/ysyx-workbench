@@ -58,6 +58,9 @@ case $1 in
   nvboard)
     init NJU-ProjectN/nvboard master nvboard false NVBOARD_HOME
     ;;
+  ysyxSoC)
+    init OSCPU/ysyxSoC 2607 ysyxSoC false
+    ;;
   riscv-tests)
     init NJU-ProjectN/riscv-tests-am master riscv-tests false
     ;;
