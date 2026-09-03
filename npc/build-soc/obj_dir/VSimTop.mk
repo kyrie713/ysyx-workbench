@@ -35,6 +35,7 @@ VM_PREFIX = VSimTop
 VM_MODPREFIX = VSimTop
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
+	-DYSYXSOC \
 	-DTOP_NAME="VSimTop" \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
@@ -42,7 +43,7 @@ VM_USER_LDLIBS = \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
-	soc-main \
+	npc-main \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
@@ -58,7 +59,7 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
-soc-main.o: /home/huang/ysyx-workbench/npc/csrc/soc-main.cpp
+npc-main.o: /home/huang/ysyx-workbench/npc/csrc/npc-main.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)

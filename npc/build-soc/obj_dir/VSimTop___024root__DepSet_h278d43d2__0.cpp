@@ -8,6 +8,16 @@
 #include "VSimTop__Syms.h"
 #include "VSimTop___024root.h"
 
+extern "C" void notify_ebreak(int code);
+
+VL_INLINE_OPT void VSimTop___024root____Vdpiimwrap_SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__notify_ebreak_TOP(IData/*31:0*/ code) {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    VSimTop___024root____Vdpiimwrap_SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__notify_ebreak_TOP\n"); );
+    // Body
+    int code__Vcvt;
+    for (size_t code__Vidx = 0; code__Vidx < 1; ++code__Vidx) code__Vcvt = code;
+    notify_ebreak(code__Vcvt);
+}
+
 #ifdef VL_DEBUG
 VL_ATTR_COLD void VSimTop___024root___dump_triggers__ico(VSimTop___024root* vlSelf);
 #endif  // VL_DEBUG
@@ -817,8 +827,6 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vl
     VSimTop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    VSimTop___024root___nba_sequent__TOP__4\n"); );
     // Init
-    CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0;
-    SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0 = 0;
     CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ifu__DOT__state;
     __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ifu__DOT__state = 0;
     CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state;
@@ -889,6 +897,13 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vl
         VL_WRITEF("[%0t] %%Error: ElaborateTop.v:1153: Assertion failed in %NSimTop.asic.soc.cdc.source.nodeOut_wsource\n",
                   64,VL_TIME_UNITED_Q(100),-9,vlSymsp->name());
         VL_STOP_MT("/home/huang/ysyx-workbench/ysyxSoC/ready-to-run/minirv/ElaborateTop.v", 1153, "");
+    }
+    if ((((IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu_reset_REG_1) 
+          & (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__commit_valid)) 
+         & (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_ebreak))) {
+        VSimTop___024root____Vdpiimwrap_SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__notify_ebreak_TOP(
+                                                                                vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__rf
+                                                                                [0xaU]);
     }
     __Vdlyvset__SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__rf__v0 = 0U;
     __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state 
@@ -1427,7 +1442,7 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vl
             = (vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__A 
                + vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__B);
     }
-    SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0 
+    vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0 
         = ((2U == (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ifu__DOT__state)) 
            & ((IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_load) 
               | (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_store)));
@@ -1458,10 +1473,10 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vl
             = vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__R2_data;
     }
     vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu_done 
-        = ((IData)(SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0) 
+        = ((IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0) 
            & (2U == (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state)));
     vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT___cpu_io_lsu_reqValid 
-        = ((IData)(SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0) 
+        = ((IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT____VdfgTmp_hcda50bf2__0) 
            & ((0U == (IData)(vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state)) 
               & (0U == vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__req_delay_count)));
     vlSelf->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__commit_valid 
@@ -1553,8 +1568,8 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__5(VSimTop___024root* vl
     VSimTop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    VSimTop___024root___nba_sequent__TOP__5\n"); );
     // Init
-    IData/*31:0*/ __Vtask_flash_read__0__data;
-    __Vtask_flash_read__0__data = 0;
+    IData/*31:0*/ __Vtask_flash_read__1__data;
+    __Vtask_flash_read__1__data = 0;
     // Body
     if (((1U == (IData)(vlSelf->SimTop__DOT__flash__DOT__state)) 
          & (0x17U == (IData)(vlSelf->SimTop__DOT__flash__DOT__counter)))) {
@@ -1563,9 +1578,9 @@ VL_INLINE_OPT void VSimTop___024root___nba_sequent__TOP__5(VSimTop___024root* vl
                                                                       ((0xfffffeU 
                                                                         & (vlSelf->SimTop__DOT__flash__DOT__addr 
                                                                            << 1U)) 
-                                                                       | (IData)(vlSelf->SimTop__DOT__asic__DOT___soc_spi_mosi)), __Vtask_flash_read__0__data);
+                                                                       | (IData)(vlSelf->SimTop__DOT__asic__DOT___soc_spi_mosi)), __Vtask_flash_read__1__data);
             vlSelf->SimTop__DOT__flash__DOT__rdata 
-                = __Vtask_flash_read__0__data;
+                = __Vtask_flash_read__1__data;
         } else {
             VL_FWRITEF(0x80000002U,"Assertion failed: Unsupport command `%xh`, only support `03h` read command\n",
                        8,vlSelf->SimTop__DOT__flash__DOT__cmd);

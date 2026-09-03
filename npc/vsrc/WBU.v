@@ -19,6 +19,7 @@ module WBU #(
     input [4:0] rd,
     output [31:0] R1_data,
     output [31:0] R2_data,
+    output [31:0] a0,
     output reg [31:0] PC,
     output [31:0] PC_plus_4,
     output reg [31:0] next_pc,
@@ -71,6 +72,7 @@ module WBU #(
         .raddr_1(r1),
         .raddr_2(r2),
         .rdata_1(R1_data),
-        .rdata_2(R2_data)
+        .rdata_2(R2_data),
+        .debug_a0(a0)
     );
 endmodule

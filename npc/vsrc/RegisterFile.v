@@ -7,7 +7,8 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   input [ADDR_WIDTH-1:0] raddr_2,
   input rst,
   output [DATA_WIDTH-1:0] rdata_1,
-  output [DATA_WIDTH-1:0] rdata_2
+  output [DATA_WIDTH-1:0] rdata_2,
+  output [DATA_WIDTH-1:0] debug_a0
   // output [DATA_WIDTH-1:0] debug_zero,
   // output [DATA_WIDTH-1:0] debug_ra,
   // output [DATA_WIDTH-1:0] debug_sp,
@@ -39,6 +40,7 @@ reg [DATA_WIDTH-1:0] rf [2**ADDR_WIDTH-1:0] /*verilator public_flat*/;
 
   assign rdata_1 = (raddr_1 == 0) ? 32'b0 : rf[raddr_1];
   assign rdata_2 = (raddr_2 == 0) ? 32'b0 : rf[raddr_2];
+  assign debug_a0 = rf[10];
 
   // assign debug_zero = 32'b0;
   // assign debug_ra = rf[1];

@@ -23,6 +23,7 @@ module NPC(
     wire [31:0] R2_data;
     wire [31:0] load_data;
     wire [31:0] RegWriteData;
+    wire [31:0] a0;
     wire Reg_WE;
     wire I_jalr;
     wire [4:0] r1;
@@ -52,6 +53,14 @@ module NPC(
     wire commit_valid;
 
     assign commit_valid = ifu_valid && (!(L_TYPE_LOAD || S_TYPE) || lsu_done);
+
+    import "DPI-C" function void notify_ebreak(input int code);
+
+    always @(posedge clock) begin
+        if (!reset && commit_valid && I_ebreak) begin
+            notify_ebreak(a0);
+        end
+    end
 
     IFU ifu(
         .clk(clock),
@@ -154,6 +163,7 @@ module NPC(
         .rd(rd),
         .R1_data(R1_data),
         .R2_data(R2_data),
+        .a0(a0),
         .PC(PC),
         .PC_plus_4(PC_plus_4),
         .next_pc(),

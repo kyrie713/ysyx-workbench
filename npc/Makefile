@@ -11,7 +11,7 @@ VERILATOR_CFLAGS += -MMD --build --cc --trace  \
 ifeq ($(SOC),1)
 TOPNAME = SimTop
 BUILD_DIR ?= ./build-soc
-SOC_IMAGE ?= $(YSYXSOC_HOME)/ready-to-run/minirv/hello-minirv-ysyxsoc.bin
+SOC_IMAGE ?= $(if $(IMAGE),$(IMAGE),$(YSYXSOC_HOME)/ready-to-run/minirv/hello-minirv-ysyxsoc.bin)
 SOC_RUN_CYCLES ?= 300000000
 
 VERILATOR_CFLAGS += --timescale 1ns/1ns --no-timing -sv \
@@ -23,7 +23,8 @@ SOC_PERIP_VSRCS := $(shell find $(YSYXSOC_HOME)/perip -type f \( -name '*.v' -o 
 VSRCS := $(shell find $(abspath ./vsrc) -name '*.v' ! -name 'top.v') \
 		$(YSYXSOC_HOME)/ready-to-run/minirv/ElaborateTop.v \
 		$(SOC_PERIP_VSRCS)
-CSRCS := $(abspath ./csrc/soc-main.cpp)
+CSRCS := $(abspath ./csrc/npc-main.cpp)
+CXXFLAGS += -DYSYXSOC
 else
 # SimpleBus 延迟测试参数，可在 make 命令行覆盖。
 IFU_MEM_LATENCY ?= 1
@@ -47,7 +48,7 @@ BUILD_DIR ?= ./build
 
 # project source
 VSRCS := $(shell find $(abspath ./vsrc) -name '*.v')
-CSRCS := $(shell find $(abspath ./csrc) \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) ! -name 'soc-main.cpp')
+CSRCS := $(shell find $(abspath ./csrc) -name '*.c' -o -name '*.cc' -o -name '*.cpp')
 endif
 
 OBJ_DIR = $(BUILD_DIR)/obj_dir
