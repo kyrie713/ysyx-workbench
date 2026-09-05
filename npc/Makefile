@@ -12,7 +12,7 @@ ifeq ($(SOC),1)
 TOPNAME = SimTop
 BUILD_DIR ?= ./build-soc
 SOC_IMAGE ?= $(if $(IMAGE),$(IMAGE),$(YSYXSOC_HOME)/ready-to-run/minirv/hello-minirv-ysyxsoc.bin)
-SOC_RUN_CYCLES ?= 300000000
+SOC_RUN_CYCLES ?= 1000000000000
 
 VERILATOR_CFLAGS += --timescale 1ns/1ns --no-timing -sv \
 				-D__VERILOG__ -DPDK_BEHAV -D__UART_TO_CONSOLE__ \

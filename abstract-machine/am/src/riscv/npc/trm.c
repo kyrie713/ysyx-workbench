@@ -1,18 +1,38 @@
 #include <am.h>
 #include <klib-macros.h>
-//#include <stdio.h>
+#include <stdio.h>
+#include <riscv/riscv.h>
 extern char _heap_start;
 int main(const char *args);
-
+#define __PLATFORM_YSYXSOC 1
 extern char _pmem_start;
 #define PMEM_SIZE (128 * 1024 * 1024)
 #define PMEM_END  ((uintptr_t)&_pmem_start + PMEM_SIZE)
-#define SERIAL_PORT 0xa0000038//0x10000000
+#ifdef __PLATFORM_YSYXSOC
+#define UART_BASE 0x10000000u
+#define UART_THR  (UART_BASE + 0x0)
+#define UART_IER  (UART_BASE + 0x1)
+#define UART_FCR  (UART_BASE + 0x2)
+#define UART_LCR  (UART_BASE + 0x3)
+#define UART_MCR  (UART_BASE + 0x4)
+#define UART_LSR  (UART_BASE + 0x5)
+#define UART_DLL  (UART_BASE + 0x0)
+#define UART_DLM  (UART_BASE + 0x1)
+#define UART_LSR_THRE 0x20
+#else
+#define UART_BASE 0xa0000038u
+#endif
 Area heap = RANGE(&_heap_start, PMEM_END);
 static const char mainargs[MAINARGS_MAX_LEN] = TOSTRING(MAINARGS_PLACEHOLDER); // defined in CFLAGS
 
 void putch(char ch) {
-  *(volatile char *)SERIAL_PORT = ch;
+#ifdef __PLATFORM_YSYXSOC
+  while ((inb(UART_LSR) & UART_LSR_THRE) == 0) {
+  }
+  outb(UART_THR, ch);
+#else
+  outb(UART_BASE, ch);
+#endif
 }
 
 void halt(int code) {
@@ -32,6 +52,16 @@ void _trm_init() {
 //     printf("mcycle = %d\n", lo);
 //     for (int i = 0; i < 1000; i++) asm volatile("nop");
 // }
+#ifdef __PLATFORM_YSYXSOC
+  // 25 MHz / 115200 / 16 = 13.56; use divisor 13 for 115200 8N1.
+  outb(UART_LCR, 0x80);
+  outb(UART_DLM, 0x00);
+  outb(UART_DLL, 0x0d);
+  outb(UART_LCR, 0x03);
+  outb(UART_FCR, 0x07);
+  outb(UART_MCR, 0x03);
+  outb(UART_IER, 0x00);
+#endif
   int ret = main(mainargs);
   halt(ret);
 }

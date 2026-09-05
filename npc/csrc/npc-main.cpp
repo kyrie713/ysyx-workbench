@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
   const char *default_image =
       "../ysyxSoC/ready-to-run/minirv/hello-minirv-ysyxsoc.bin";
   const char *image_path = default_image;
-  uint64_t run_cycles = 300000000;
+  uint64_t run_cycles = 1000000000000;
 
   if (argc > 1) {
     char *end = nullptr;
@@ -104,9 +104,7 @@ int main(int argc, char **argv) {
   }
 
   top->reset = 0;
-  for (uint64_t cycle = 0;
-       cycle < run_cycles && !simulation_finished;
-       cycle++) {
+  while (!simulation_finished) {
     single_cycle();
   }
 
