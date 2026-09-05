@@ -2,25 +2,22 @@
 // DESCRIPTION: Verilator output: Design implementation internals
 // See VSimTop.h for the primary calling header
 
-#include "verilated.h"
-#include "verilated_dpi.h"
+#include "VSimTop__pch.h"
 
-#include "VSimTop__Syms.h"
-#include "VSimTop___024unit.h"
 
-void VSimTop___024unit___ctor_var_reset(VSimTop___024unit* vlSelf);
+VSimTop___024unit::VSimTop___024unit() = default;
+VSimTop___024unit::~VSimTop___024unit() = default;
 
-VSimTop___024unit::VSimTop___024unit(VSimTop__Syms* symsp, const char* v__name)
-    : VerilatedModule{v__name}
-    , vlSymsp{symsp}
- {
+void VSimTop___024unit::ctor(VSimTop__Syms* symsp, const char* namep) {
+    vlSymsp = symsp;
+    vlNamep = strdup(Verilated::catName(vlSymsp->name(), namep));
     // Reset structure values
-    VSimTop___024unit___ctor_var_reset(this);
 }
 
 void VSimTop___024unit::__Vconfigure(bool first) {
-    if (false && first) {}  // Prevent unused
+    (void)first;  // Prevent unused variable warning
 }
 
-VSimTop___024unit::~VSimTop___024unit() {
+void VSimTop___024unit::dtor() {
+    VL_DO_DANGLING(std::free(const_cast<char*>(vlNamep)), vlNamep);
 }

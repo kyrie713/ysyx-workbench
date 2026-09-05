@@ -26,7 +26,9 @@ extern "C" void flash_read(int32_t addr, int32_t *data) {
 extern "C" void notify_ebreak(int32_t code) {
   halt_code = code;
   simulation_finished = true;
-  printf("%s\n", code == 0 ? "HIT GOOD TRAP" : "HIT BAD TRAP");
+  printf("%s\n", code == 0
+    ? "\033[32mHIT GOOD TRAP\033[0m"
+    : "\033[31mHIT BAD TRAP\033[0m");
 }
 
 static VSimTop *top;

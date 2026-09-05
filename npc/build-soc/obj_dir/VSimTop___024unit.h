@@ -7,22 +7,26 @@
 
 #include "verilated.h"
 
+
 class VSimTop__Syms;
 
-class VSimTop___024unit final : public VerilatedModule {
+class alignas(VL_CACHE_LINE_BYTES) VSimTop___024unit final {
   public:
 
     // INTERNAL VARIABLES
-    VSimTop__Syms* const vlSymsp;
+    VSimTop__Syms* vlSymsp;
+    const char* vlNamep;
 
     // CONSTRUCTORS
-    VSimTop___024unit(VSimTop__Syms* symsp, const char* v__name);
+    VSimTop___024unit();
     ~VSimTop___024unit();
+    void ctor(VSimTop__Syms* symsp, const char* namep);
+    void dtor();
     VL_UNCOPYABLE(VSimTop___024unit);
 
     // INTERNAL METHODS
     void __Vconfigure(bool first);
-} VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
+};
 
 
 #endif  // guard
