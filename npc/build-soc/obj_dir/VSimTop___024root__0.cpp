@@ -401,10 +401,13 @@ void VSimTop___024root___ico_sequent__TOP__0(VSimTop___024root* vlSelf) {
                  | ((- (IData)((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__sel_3))) 
                     & (((0U == (3U & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
                                       >> 2U))) ? (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg)
-                         : ((- (IData)((1U == (3U & 
+                         : ((1U == (3U & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
+                                          >> 2U))) ? (IData)(vlSelfRef.externalPins_mygpio_in)
+                             : (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                                & (- (IData)((2U == 
+                                              (3U & 
                                                (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
-                                                >> 2U))))) 
-                            & (IData)(vlSelfRef.externalPins_mygpio_in))) 
+                                                >> 2U)))))))) 
                        & (- (IData)(((~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write)) 
                                      & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_3_psel)))))))));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_rdata 
@@ -459,7 +462,7 @@ void VSimTop___024root___ico_sequent__TOP__1(VSimTop___024root* vlSelf) {
                         & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9))) 
                | (IData)(((0x00000010U == (0x00000070U 
                                            & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
-                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32)))) 
+                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33)))) 
               | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_jalr)) 
              | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__U_TYPE)) 
             | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__S_TYPE)) 
@@ -1735,9 +1738,9 @@ void VSimTop___024root___nba_sequent__TOP__1(VSimTop___024root* vlSelf) {
                                                 & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
                                                 ? 0x20U
                                                 : 0x10U))
-                                : (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33))
+                                : (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_34))
                             : ((4U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
-                                ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33)
+                                ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_34)
                                 : ((2U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
                                     ? ((1U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
                                         ? 0x10U : 8U)
@@ -1752,7 +1755,7 @@ void VSimTop___024root___nba_sequent__TOP__1(VSimTop___024root* vlSelf) {
                                                     ? 
                                                    ((4U 
                                                      & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
-                                                     ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_35)
+                                                     ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_36)
                                                      : 
                                                     ((- (IData)(
                                                                 (1U 
@@ -1765,7 +1768,7 @@ void VSimTop___024root___nba_sequent__TOP__1(VSimTop___024root* vlSelf) {
                                                     : 
                                                    ((4U 
                                                      & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
-                                                     ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_35)
+                                                     ? (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_36)
                                                      : 
                                                     (1U 
                                                      & ((- (IData)(
@@ -2065,11 +2068,45 @@ void VSimTop___024root___nba_sequent__TOP__1(VSimTop___024root* vlSelf) {
                                                               & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__s_psram_sio_oen))))));
 }
 
+extern const VlWide<16>/*511:0*/ VSimTop__ConstPool__CONST_hc8ecf1fb_0;
+
 void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    VSimTop___024root___nba_sequent__TOP__2\n"); );
     VSimTop__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     auto& vlSelfRef = std::ref(*vlSelf).get();
     // Locals
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__hex = 0;
+    CData/*7:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__Vfuncout = 0;
+    CData/*3:0*/ __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__hex;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__hex = 0;
     CData/*0:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__io_deq_q__DOT__valid_0;
     __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__io_deq_q__DOT__valid_0 = 0;
     CData/*0:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__io_deq_q__DOT__valid_1;
@@ -2364,9 +2401,8 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
         } else if (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_2) {
             __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_0 = 0U;
         }
-        if ((((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_3_pready) 
-              & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write)) 
-             & (0U == (0x0000000cU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr)))) {
+        if ((IData)(((0U == (0x0000000cU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr)) 
+                     & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_23)))) {
             if ((1U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_pstrb))) {
                 vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg 
                     = ((0xff00U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg)) 
@@ -2376,6 +2412,29 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
                 vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg 
                     = ((0x00ffU & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg)) 
                        | (0x0000ff00U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg));
+            }
+        }
+        if ((IData)(((8U == (0x0000000cU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr)) 
+                     & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_23)))) {
+            if ((1U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_pstrb))) {
+                vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                    = ((0xffffff00U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg) 
+                       | (0x000000ffU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg));
+            }
+            if ((2U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_pstrb))) {
+                vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                    = ((0xffff00ffU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg) 
+                       | (0x0000ff00U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg));
+            }
+            if ((4U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_pstrb))) {
+                vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                    = ((0xff00ffffU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg) 
+                       | (0x00ff0000U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg));
+            }
+            if ((8U & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_pstrb))) {
+                vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                    = ((0x00ffffffU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg) 
+                       | (0xff000000U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg));
             }
         }
     } else {
@@ -2389,6 +2448,7 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
         __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN = 0U;
         __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_0 = 0U;
         vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg = 0U;
+        vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg = 0U;
     }
     if (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_awready) {
         vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__wdata_reg 
@@ -2430,6 +2490,86 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
         vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__elts_1_data 
             = vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_rdata;
     }
+    vlSelfRef.externalPins_mygpio_out = vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__hex 
+        = (0x0000000fU & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg);
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_0 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__1__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 4U));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_1 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__2__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 8U));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_2 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__3__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 0x0cU));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_3 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__4__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 0x10U));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_4 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__5__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 0x14U));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_5 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__6__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__hex 
+        = (0x0000000fU & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                          >> 0x18U));
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_6 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__7__Vfuncout;
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__hex 
+        = (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+           >> 0x1cU);
+    vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high 
+        = (0x000000ffU & VSimTop__ConstPool__CONST_hc8ecf1fb_0
+           [(0x07ffffffU & (IData)(__Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__hex))]);
+    __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__Vfuncout 
+        = (0x000000ffU & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__Vstatic__active_high)));
+    vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_7 
+        = __Vfunc_SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__hex_to_seg__8__Vfuncout;
     if (((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_arready)
           ? ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__valid_1) 
              | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT___valid_1_T_4))
@@ -2484,8 +2624,7 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
         vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__io_deq_q__DOT__elts_1_size 
             = vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__io_deq_q__DOT__io_enq_bits_size;
     }
-    vlSelfRef.externalPins_mygpio_out = vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg;
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33 = ((2U 
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_34 = ((2U 
                                                   & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
                                                   ? 0x20U
                                                   : 
@@ -2493,7 +2632,7 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
                                                    & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))
                                                    ? 0x20U
                                                    : 8U));
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_35 = (2U 
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_36 = (2U 
                                                  & ((- (IData)(
                                                                (1U 
                                                                 & (~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg))))) 
@@ -2587,6 +2726,14 @@ void VSimTop___024root___nba_sequent__TOP__2(VSimTop___024root* vlSelf) {
         = __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__valid_0;
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__valid_1 
         = __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__valid_1;
+    vlSelfRef.externalPins_mygpio_seg_0 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_0;
+    vlSelfRef.externalPins_mygpio_seg_1 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_1;
+    vlSelfRef.externalPins_mygpio_seg_2 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_2;
+    vlSelfRef.externalPins_mygpio_seg_3 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_3;
+    vlSelfRef.externalPins_mygpio_seg_4 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_4;
+    vlSelfRef.externalPins_mygpio_seg_5 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_5;
+    vlSelfRef.externalPins_mygpio_seg_6 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_6;
+    vlSelfRef.externalPins_mygpio_seg_7 = vlSelfRef.SimTop__DOT__asic__DOT___soc_mygpio_seg_7;
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__valid_0 
         = __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__valid_0;
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__valid_1 
@@ -3396,7 +3543,7 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
                                                          & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst 
                                                             >> 0x00000014U))))
                                                    : 0U)))));
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_30 = (IData)(
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_31 = (IData)(
                                                         (3U 
                                                          == 
                                                          (7U 
@@ -3407,17 +3554,17 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
     vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9 = ((~ 
                                                  (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst 
                                                   >> 3U)) 
-                                                & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_30));
+                                                & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_31));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_TYPE 
         = (IData)(((0x00000030U == (0x00000070U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
                    & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9)));
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32 = (IData)(
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33 = (IData)(
                                                         ((0U 
                                                           == 
                                                           (0x00007000U 
                                                            & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
                                                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9)));
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29 = (IData)(
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_30 = (IData)(
                                                         ((0x00002000U 
                                                           == 
                                                           (0x00007010U 
@@ -3425,13 +3572,13 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
                                                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sb 
         = (IData)(((0x00000020U == (0x00000070U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
-                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32)));
+                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lw 
         = (IData)(((0U == (0x00000060U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
-                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29)));
+                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_30)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sw 
         = (IData)(((0x00000020U == (0x00000060U & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
-                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29)));
+                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_30)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_size 
         = (2U & (- (IData)((1U & (~ ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lbu) 
                                      | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sb)))))));
@@ -3470,7 +3617,7 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
                         & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_9))) 
                | (IData)(((0x00000010U == (0x00000070U 
                                            & vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__inst)) 
-                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32)))) 
+                          & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_33)))) 
               | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_jalr)) 
              | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__U_TYPE)) 
             | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__S_TYPE)) 
@@ -3515,15 +3662,15 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
             = (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__rdata_2 
                & (- (IData)((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sw))));
     }
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_31 = (((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_load) 
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32 = (((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_load) 
                                                   | (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_store)) 
                                                  & (2U 
                                                     == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ifu__DOT__state)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_done 
         = ((2U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state)) 
-           & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_31));
+           & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_reqValid 
-        = ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_31) 
+        = ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_32) 
            & ((0U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state)) 
               & (0U == vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__req_delay_count)));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__inst_valid 
@@ -3534,7 +3681,7 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_wen 
         = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_store) 
            & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_reqValid));
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_28 = ((0U 
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29 = ((0U 
                                                   == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateD)) 
                                                  & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_wen));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__isValidLoad 
@@ -3542,12 +3689,12 @@ void VSimTop___024root___nba_sequent__TOP__4(VSimTop___024root* vlSelf) {
            & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_reqValid));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__source__DOT__nodeOut_awsource__DOT__io_deq_valid 
         = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__source__DOT__nodeOut_arsource__DOT__enq_in_REG) 
-           & ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_28) 
+           & ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29) 
               | ((3U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateD)) 
                  | (5U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateD)))));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__source__DOT__nodeOut_wsource__DOT__io_deq_valid 
         = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__source__DOT__nodeOut_arsource__DOT__enq_in_REG) 
-           & ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_28) 
+           & ((IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_29) 
               | ((3U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateD)) 
                  | (4U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateD)))));
     vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__lsuRead 
@@ -4262,6 +4409,8 @@ void VSimTop___024root___nba_sequent__TOP__8(VSimTop___024root* vlSelf) {
         = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_3_psel) 
            & ((2U == (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__state)) 
               & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__sel_3)));
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_23 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write) 
+                                                 & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_3_pready));
 }
 
 void VSimTop___024root___nba_comb__TOP__2(VSimTop___024root* vlSelf) {
@@ -4417,7 +4566,7 @@ void VSimTop___024root___nba_comb__TOP__3(VSimTop___024root* vlSelf) {
     CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_21;
     __VdfgRegularize_h6e95ff9d_0_21 = 0;
     // Body
-    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_25 = ((~ 
+    vlSelfRef.__VdfgRegularize_h6e95ff9d_0_26 = ((~ 
                                                   ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__lcr) 
                                                    >> 7U)) 
                                                  & (0U 
@@ -4596,10 +4745,13 @@ void VSimTop___024root___nba_comb__TOP__3(VSimTop___024root* vlSelf) {
                  | ((- (IData)((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__sel_3))) 
                     & (((0U == (3U & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
                                       >> 2U))) ? (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg)
-                         : ((- (IData)((1U == (3U & 
+                         : ((1U == (3U & (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
+                                          >> 2U))) ? (IData)(vlSelfRef.externalPins_mygpio_in)
+                             : (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_seg_reg 
+                                & (- (IData)((2U == 
+                                              (3U & 
                                                (vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_in_paddr 
-                                                >> 2U))))) 
-                            & (IData)(vlSelfRef.externalPins_mygpio_in))) 
+                                                >> 2U)))))))) 
                        & (- (IData)(((~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write)) 
                                      & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_3_psel)))))))));
     vlSelfRef.__VdfgRegularize_h6e95ff9d_0_19 = (1U 
@@ -4779,8 +4931,8 @@ void VSimTop___024root___eval_body__nba(VSimTop___024root* vlSelf) {
     if ((0x0000000000000040ULL & vlSelfRef.__VnbaTriggered[0U])) {
         {
             // Inlined CFunc: _nba_sequent__TOP__5
-            IData/*31:0*/ __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__1__data;
-            __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__1__data = 0;
+            IData/*31:0*/ __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__9__data;
+            __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__9__data = 0;
             if (((1U == (IData)(vlSelfRef.SimTop__DOT__flash__DOT__state)) 
                  & (0x17U == (IData)(vlSelfRef.SimTop__DOT__flash__DOT__counter)))) {
                 if (VL_LIKELY(((3U == (IData)(vlSelfRef.SimTop__DOT__flash__DOT__cmd))))) {
@@ -4788,9 +4940,9 @@ void VSimTop___024root___eval_body__nba(VSimTop___024root* vlSelf) {
                                                                               ((0x00fffffeU 
                                                                                 & (vlSelfRef.SimTop__DOT__flash__DOT__addr 
                                                                                 << 1U)) 
-                                                                               | (IData)(vlSelfRef.SimTop__DOT__asic__DOT___soc_spi_mosi)), __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__1__data);
+                                                                               | (IData)(vlSelfRef.SimTop__DOT__asic__DOT___soc_spi_mosi)), __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__9__data);
                     vlSelfRef.SimTop__DOT__flash__DOT__rdata 
-                        = __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__1__data;
+                        = __Vinline_0__nba_sequent__TOP__5___Vtask_flash_read__9__data;
                 } else {
                     VL_FWRITEF_NX(0x80000002U,"Assertion failed: Unsupport command `%xh`, only support `03h` read command\n",1
                                   , '#',8,vlSelfRef.SimTop__DOT__flash__DOT__cmd);
@@ -4917,18 +5069,18 @@ void VSimTop___024root___eval_body__nba(VSimTop___024root* vlSelf) {
     if ((3ULL & vlSelfRef.__VnbaTriggered[0U])) {
         {
             // Inlined CFunc: _nba_comb__TOP__4
-            CData/*0:0*/ __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_26;
-            __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_26 = 0;
-            __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_26 
+            CData/*0:0*/ __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_27;
+            __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_27 = 0;
+            __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_27 
                 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc_reset_REG_1) 
                    & ((~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_1_penable)) 
                       & (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__auto_anon_out_1_psel)));
             vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__wb_we_i 
                 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write) 
-                   & __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_26);
+                   & __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_27);
             vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__wb_re_i 
                 = ((~ (IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__axi42apb__DOT__is_write)) 
-                   & __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_26);
+                   & __Vinline_0__nba_comb__TOP__4___VdfgRegularize_h6e95ff9d_0_27);
         }
     }
     if ((7ULL & vlSelfRef.__VnbaTriggered[0U])) {
@@ -4936,10 +5088,10 @@ void VSimTop___024root___eval_body__nba(VSimTop___024root* vlSelf) {
             // Inlined CFunc: _nba_comb__TOP__5
             vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__fifo_write 
                 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__wb_we_i) 
-                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_25));
+                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_26));
             vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__fifo_read 
                 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__wb_re_i) 
-                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_25));
+                   & (IData)(vlSelfRef.__VdfgRegularize_h6e95ff9d_0_26));
             vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__iir_read 
                 = ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__wb_re_i) 
                    & ((~ ((IData)(vlSelfRef.SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__lcr) 

@@ -43,7 +43,7 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep, VSim
     , TOP{this, namep}
 {
     // Check resources
-    Verilated::stackCheck(341);
+    Verilated::stackCheck(373);
     // Setup sub module instances
     TOP____024unit.ctor(this, "$unit");
     // Configure time unit / time precision
