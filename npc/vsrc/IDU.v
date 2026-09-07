@@ -18,6 +18,9 @@ module IDU(
   output reg S_sw,
   output reg S_sb,
   output reg I_ebreak,
+  output reg I_csrrw,
+  output reg I_csrrs,
+  output reg [11:0] csr_addr,
   output reg [31:0] imm,
   output reg [4:0]r1,
   output reg [4:0]r2,
@@ -49,10 +52,14 @@ module IDU(
     I_add = 0;
     S_sw = 0;
     S_sb = 0;
+    I_ebreak = 0;
+    I_csrrw = 0;
+    I_csrrs = 0;
     imm = 0;
     I_TYPE = 0;  
     U_TYPE = 0;
 
+    csr_addr = inst[31:20];
     r1 = inst[19:15];
     r2 = inst[24:20];
     rd = inst[11:7];
@@ -104,7 +111,11 @@ module IDU(
             U_lui = 1;//LUI
         end
         7'b1110011:begin
-            if(inst[31:7] == 25'b0000000000010000000000000) begin
+            if(funct3 == 3'b001) begin
+                I_csrrw = 1;
+            end else if(funct3 == 3'b010) begin
+                I_csrrs = 1;
+            end else if(inst[31:7] == 25'b0000000000010000000000000) begin
                 I_ebreak = 1;
             end
         end

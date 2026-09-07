@@ -14,6 +14,9 @@ module WBU #(
     input I_jalr,
     input l_lw,
     input l_lbu,
+    input I_csrrw,
+    input I_csrrs,
+    input [31:0] csr_rdata,
     input [4:0] r1,
     input [4:0] r2,
     input [4:0] rd,
@@ -33,13 +36,16 @@ module WBU #(
     assign PC_plus_4 = PC + 32'd4;
 
     always @(*) begin
-        Reg_WE = inst_valid && (R_TYPE | I_TYPE | U_TYPE | J_TYPE);
+        Reg_WE = inst_valid &&
+                 (R_TYPE | I_TYPE | U_TYPE | J_TYPE | I_csrrw | I_csrrs);
 
         RegWriteData = 32'b0;
         if (l_lw | l_lbu) begin
             RegWriteData = load_data;
         end else if (I_jalr | J_TYPE) begin
             RegWriteData = PC_plus_4;
+        end else if (I_csrrw | I_csrrs) begin
+            RegWriteData = csr_rdata;
         end else if (R_TYPE | I_TYPE_ARITH | U_TYPE) begin
             RegWriteData = ALU_OUT;
         end

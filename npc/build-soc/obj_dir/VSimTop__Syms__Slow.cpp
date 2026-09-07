@@ -13,7 +13,7 @@ extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[];
 # pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
 extern const VlVarTableEntry VSimTop___024root__VpiVarTable0[] = {
-    {"rf", offsetof(VSimTop___024root, SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__rf), VLVT_UINT32, (VLVD_NODIR|VLVF_PUB_RW|VLVF_CONTINUOUSLY), 1, 1, {31, 0, 31, 0, 0, 0}},
+    {"rf", offsetof(VSimTop___024root, SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__rf), VLVT_UINT32, (VLVD_NODIR|VLVF_PUB_RW), 1, 1, {31, 0, 31, 0, 0, 0}},
 };
 extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[] = {
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__axi42apb), "SimTop.asic.soc.axi42apb", "axi42apb", "<null>", -9, VerilatedScope::SCOPE_OTHER},
@@ -43,7 +43,7 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep, VSim
     , TOP{this, namep}
 {
     // Check resources
-    Verilated::stackCheck(373);
+    Verilated::stackCheck(381);
     // Setup sub module instances
     TOP____024unit.ctor(this, "$unit");
     // Configure time unit / time precision

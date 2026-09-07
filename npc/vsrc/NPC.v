@@ -47,6 +47,10 @@ module NPC(
     wire S_sw;
     wire S_sb;
     wire I_ebreak;
+    wire I_csrrw;
+    wire I_csrrs;
+    wire [11:0] csr_addr;
+    wire [31:0] csr_rdata;
     wire [31:0] inst;
     wire ifu_valid;
     wire lsu_done;
@@ -95,6 +99,9 @@ module NPC(
         .S_sw(S_sw),
         .S_sb(S_sb),
         .I_ebreak(I_ebreak),
+        .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
+        .csr_addr(csr_addr),
         .imm(imm),
         .r1(r1),
         .r2(r2),
@@ -142,6 +149,18 @@ module NPC(
         .ALU_OUT(ALU_OUT)
     );
 
+    CSR csr(
+        .clk(clock),
+        .rst(reset),
+        .csr_valid(commit_valid),
+        .I_csrrs(I_csrrs),
+        .I_csrrw(I_csrrw),
+        .csr_addr(csr_addr),
+        .csr_rs1(r1),
+        .csr_wdata(R1_data),
+        .csr_rdata(csr_rdata)
+    );
+
     WBU #(
         .RESET_PC(32'h30000000)
     ) wbu(
@@ -158,6 +177,9 @@ module NPC(
         .I_jalr(I_jalr),
         .l_lw(l_lw),
         .l_lbu(l_lbu),
+        .I_csrrw(I_csrrw),
+        .I_csrrs(I_csrrs),
+        .csr_rdata(csr_rdata),
         .r1(r1),
         .r2(r2),
         .rd(rd),

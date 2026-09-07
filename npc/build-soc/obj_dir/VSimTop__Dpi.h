@@ -18,7 +18,7 @@ extern "C" {
     // DPI IMPORTS
     // DPI import at /home/huang/ysyx-workbench/ysyxSoC/perip/flash/flash.v:84:30
     extern void flash_read(int addr, int* data);
-    // DPI import at /home/huang/ysyx-workbench/npc/vsrc/NPC.v:57:34
+    // DPI import at /home/huang/ysyx-workbench/npc/vsrc/NPC.v:61:34
     extern void notify_ebreak(int code);
 
 #ifdef __cplusplus
