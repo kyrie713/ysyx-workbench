@@ -3,7 +3,7 @@
 
 #include "VSimTop.h"
 #include "verilated.h"
-
+#include <nvboard.h>
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -14,6 +14,8 @@ static constexpr size_t FLASH_SIZE = 16 * 1024 * 1024;
 static uint8_t flash[FLASH_SIZE];
 static bool simulation_finished = false;
 static int32_t halt_code = 0;
+void nvboard_bind_all_pins(VSimTop *top);
+
 
 extern "C" void flash_read(int32_t addr, int32_t *data) {
   // flash.v provides a byte offset after removing the 0x30000000 base.
@@ -65,6 +67,7 @@ static void single_cycle() {
   top->clock = 1;
   top->cpuClock = 1;
   top->eval();
+  nvboard_update();
   contextp->timeInc(1);
 }
 
@@ -97,7 +100,10 @@ int main(int argc, char **argv) {
   top->reset = 1;
   top->coreSel = 0;
   top->externalPins_mygpio_in = 0;
-  top->externalPins_uart0_rx = 0;
+  top->externalPins_uart0_rx = 1;
+
+  nvboard_bind_all_pins(top);
+  nvboard_init();
 
   for (int cycle = 0; cycle < 100; cycle++) {
     single_cycle();
@@ -109,6 +115,7 @@ int main(int argc, char **argv) {
   }
 
   top->final();
+  //nvboard_quit();
   delete top;
   delete contextp;
   return simulation_finished && halt_code != 0 ? EXIT_FAILURE : EXIT_SUCCESS;

@@ -38,17 +38,28 @@ VM_MODPREFIX = VSimTop
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
   -DYSYXSOC \
+  -MMD \
+  -O3 \
+  -I/usr/include/SDL2 \
+  -D_REENTRANT \
+  -I/home/huang/ysyx-workbench/nvboard/usr/include \
   -DTOP_NAME="VSimTop" \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \
+  /home/huang/ysyx-workbench/nvboard/build/nvboard.a \
+  -lSDL2 \
+  -lSDL2_image \
+  -lSDL2_ttf \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
+  auto_bind \
   npc-main \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
+  .. \
   ../.. \
   ../../csrc \
 
@@ -61,6 +72,8 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
+auto_bind.o: /home/huang/ysyx-workbench/npc/build-soc/auto_bind.cpp 
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST)  -c -o $@ $<
 npc-main.o: /home/huang/ysyx-workbench/npc/csrc/npc-main.cpp 
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST)  -c -o $@ $<
 

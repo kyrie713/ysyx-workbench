@@ -1,7 +1,7 @@
 SOC ?= 1
 TOPNAME = SimTop
 YSYXSOC_HOME ?= $(abspath ../ysyxSoC)
-# NXDC_FILES = constr/top.nxdc
+NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
 VERILATOR = verilator
@@ -23,7 +23,8 @@ SOC_PERIP_VSRCS := $(shell find $(YSYXSOC_HOME)/perip -type f \( -name '*.v' -o 
 VSRCS := $(shell find $(abspath ./vsrc) -name '*.v' ! -name 'top.v') \
 		$(YSYXSOC_HOME)/ready-to-run/minirv/ElaborateTop.v \
 		$(SOC_PERIP_VSRCS)
-CSRCS := $(abspath ./csrc/npc-main.cpp)
+SRC_AUTO_BIND := $(abspath $(BUILD_DIR)/auto_bind.cpp)
+CSRCS := $(abspath ./csrc/npc-main.cpp) $(SRC_AUTO_BIND)
 CXXFLAGS += -DYSYXSOC
 else
 # SimpleBus 延迟测试参数，可在 make 命令行覆盖。
@@ -58,11 +59,13 @@ default: $(BIN)
 
 $(shell mkdir -p $(BUILD_DIR))  
 
+ifeq ($(SOC),1)
+$(SRC_AUTO_BIND): $(NXDC_FILES)
+	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+endif
 
-#CSRCS += $(SRC_AUTO_BIND)
 
-
-#include $(NVBOARD_HOME)/scripts/nvboard.mk 
+include $(NVBOARD_HOME)/scripts/nvboard.mk
 
 
 INCFLAGS = $(addprefix -I, $(INC_PATH))
@@ -91,10 +94,10 @@ $(KCONFIG_HEADER): $(KCONFIG_CONF)
 	@echo "// Auto generated header" > $@
 	@grep -E '^CONFIG_' $(KCONFIG_CONF) | sed 's/^\(.*\)=y$$/#define \1 1/' >> $@
 
-$(BIN): $(VSRCS) $(CSRCS) $(KCONFIG_HEADER)#$(NVBOARD_ARCHIVE)
+$(BIN): $(VSRCS) $(CSRCS) $(KCONFIG_HEADER) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOPNAME) $(VSRCS)  $(CSRCS)\
+		--top-module $(TOPNAME) $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE) \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 all: default
