@@ -3,7 +3,6 @@
 
 #include "VSimTop__pch.h"
 
-extern const VlVarTableEntry VSimTop___024root__VpiVarTable0[];
 extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[];
 
 
@@ -12,9 +11,6 @@ extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[];
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
-extern const VlVarTableEntry VSimTop___024root__VpiVarTable0[] = {
-    {"rf", offsetof(VSimTop___024root, SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__rf), VLVT_UINT32, (VLVD_NODIR|VLVF_PUB_RW), 1, 1, {31, 0, 31, 0, 0, 0}},
-};
 extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[] = {
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__axi42apb), "SimTop.asic.soc.axi42apb", "axi42apb", "<null>", -9, VerilatedScope::SCOPE_OTHER},
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__cdc__sink__nodeIn_bsource), "SimTop.asic.soc.cdc.sink.nodeIn_bsource", "nodeIn_bsource", "<null>", -9, VerilatedScope::SCOPE_OTHER},
@@ -27,7 +23,6 @@ extern const VlScopeTableEntry VSimTop__Syms__VpiScopeTable[] = {
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_arsource), "SimTop.asic.soc.cdc.source.nodeOut_arsource", "nodeOut_arsource", "<null>", -9, VerilatedScope::SCOPE_OTHER},
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_awsource), "SimTop.asic.soc.cdc.source.nodeOut_awsource", "nodeOut_awsource", "<null>", -9, VerilatedScope::SCOPE_OTHER},
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_wsource), "SimTop.asic.soc.cdc.source.nodeOut_wsource", "nodeOut_wsource", "<null>", -9, VerilatedScope::SCOPE_OTHER},
-    {offsetof(VSimTop__Syms, __Vscopep_SimTop__asic__soc__cpu__core0__wbu__regfile), "SimTop.asic.soc.cpu.core0.wbu.regfile", "regfile", "<null>", 0, VerilatedScope::SCOPE_OTHER},
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__flash), "SimTop.flash", "flash", "<null>", -9, VerilatedScope::SCOPE_OTHER},
     {offsetof(VSimTop__Syms, __Vscopep_SimTop__flash__flash_cmd_i), "SimTop.flash.flash_cmd_i", "flash_cmd_i", "<null>", -9, VerilatedScope::SCOPE_OTHER},
 };
@@ -43,7 +38,7 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep, VSim
     , TOP{this, namep}
 {
     // Check resources
-    Verilated::stackCheck(381);
+    Verilated::stackCheck(379);
     // Setup sub module instances
     TOP____024unit.ctor(this, "$unit");
     // Configure time unit / time precision
@@ -55,11 +50,9 @@ VSimTop__Syms::VSimTop__Syms(VerilatedContext* contextp, const char* namep, VSim
     TOP.__Vconfigure(true);
     TOP____024unit.__Vconfigure(true);
     // Setup scopes
-    VerilatedScope::scopesConstructFromTable(VSimTop__Syms__VpiScopeTable, 14, this);
+    VerilatedScope::scopesConstructFromTable(VSimTop__Syms__VpiScopeTable, 13, this);
     // Setup export functions - final: 0
     // Setup export functions - final: 1
-    // Setup public variables
-    __Vscopep_SimTop__asic__soc__cpu__core0__wbu__regfile->varsInsertFromTable(VSimTop___024root__VpiVarTable0, 1, &(TOP));
 }
 
 VSimTop__Syms::~VSimTop__Syms() {
@@ -75,7 +68,6 @@ VSimTop__Syms::~VSimTop__Syms() {
     VL_DO_CLEAR(delete __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_arsource, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_arsource = nullptr);
     VL_DO_CLEAR(delete __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_awsource, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_awsource = nullptr);
     VL_DO_CLEAR(delete __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_wsource, __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_wsource = nullptr);
-    VL_DO_CLEAR(delete __Vscopep_SimTop__asic__soc__cpu__core0__wbu__regfile, __Vscopep_SimTop__asic__soc__cpu__core0__wbu__regfile = nullptr);
     VL_DO_CLEAR(delete __Vscopep_SimTop__flash, __Vscopep_SimTop__flash = nullptr);
     VL_DO_CLEAR(delete __Vscopep_SimTop__flash__flash_cmd_i, __Vscopep_SimTop__flash__flash_cmd_i = nullptr);
     // Tear down sub module instances

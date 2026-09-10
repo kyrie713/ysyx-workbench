@@ -45,7 +45,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop__Syms final : public VerilatedSyms {
     VerilatedScope* __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_arsource;
     VerilatedScope* __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_awsource;
     VerilatedScope* __Vscopep_SimTop__asic__soc__cdc__source__nodeOut_wsource;
-    VerilatedScope* __Vscopep_SimTop__asic__soc__cpu__core0__wbu__regfile;
     VerilatedScope* __Vscopep_SimTop__flash;
     VerilatedScope* __Vscopep_SimTop__flash__flash_cmd_i;
 

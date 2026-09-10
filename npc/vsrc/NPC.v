@@ -17,14 +17,11 @@ module NPC(
     input  [31:0] io_lsu_rdata
 );
     wire [31:0] PC;
-    wire [31:0] PC_plus_4;
     wire [31:0] ALU_OUT;
     wire [31:0] R1_data;
     wire [31:0] R2_data;
     wire [31:0] load_data;
-    wire [31:0] RegWriteData;
     wire [31:0] a0;
-    wire Reg_WE;
     wire I_jalr;
     wire [4:0] r1;
     wire [4:0] r2;
@@ -36,10 +33,8 @@ module NPC(
     wire S_TYPE;
     wire U_TYPE;
     wire I_TYPE;
-    wire MemWEn;
     wire B_TYPE;
     wire J_TYPE;
-    wire U_lui;
     wire R_add;
     wire l_lw;
     wire l_lbu;
@@ -87,11 +82,9 @@ module NPC(
         .S_TYPE(S_TYPE),
         .U_TYPE(U_TYPE),
         .I_TYPE(I_TYPE),
-        .MemWEn(MemWEn),
         .B_TYPE(B_TYPE),
         .J_TYPE(J_TYPE),
         .I_jalr(I_jalr),
-        .U_lui(U_lui),
         .R_add(R_add),
         .l_lw(l_lw),
         .l_lbu(l_lbu),
@@ -186,10 +179,6 @@ module NPC(
         .R1_data(R1_data),
         .R2_data(R2_data),
         .a0(a0),
-        .PC(PC),
-        .PC_plus_4(PC_plus_4),
-        .next_pc(),
-        .RegWriteData(RegWriteData),
-        .Reg_WE(Reg_WE)
+        .PC(PC)
     );
 endmodule

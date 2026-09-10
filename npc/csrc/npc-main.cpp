@@ -1,19 +1,43 @@
 #define YSYXSOC 1
+#ifndef not_include_loading
+#define not_include_loading 1
+#endif
+#ifndef CPU_CLOCK_RATIO
+#define CPU_CLOCK_RATIO 1
+#endif
+#if CPU_CLOCK_RATIO < 1
+#error "CPU_CLOCK_RATIO must be at least 1"
+#endif
 #ifdef YSYXSOC
 
 #include "VSimTop.h"
+#include "VSimTop___024root.h"
 #include "verilated.h"
+#include "verilated_vcd_c.h"
 #include <nvboard.h>
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define NPC_WAVEFORM 1
 static constexpr size_t FLASH_SIZE = 16 * 1024 * 1024;
 static uint8_t flash[FLASH_SIZE];
 static bool simulation_finished = false;
 static int32_t halt_code = 0;
+static bool measure_soc = false;
+static uint64_t soc_cycles = 0;
+static uint64_t soc_instructions = 0;
+static VerilatedVcdC *soc_trace = nullptr;
+static bool trace_enabled = false;
+static bool trace_started = false;
+static uint64_t trace_cycles = 0;
+static constexpr uint64_t TRACE_WINDOW = 2500;
+static uint64_t clock_phase = 0;
+static bool slow_clock_level = false;
+#if not_include_loading
+static bool app_started = false;
+#endif
 void nvboard_bind_all_pins(VSimTop *top);
 
 
@@ -61,14 +85,75 @@ static void load_flash(const char *image_path) {
 }
 
 static void single_cycle() {
-  top->clock = 0;
+  bool slow_clock_rise = false;
+
   top->cpuClock = 0;
+  bool next_clock_level = ((clock_phase / CPU_CLOCK_RATIO) & 1) != 0;
+  if (!slow_clock_level && next_clock_level) {
+    slow_clock_rise = true;
+  }
+  slow_clock_level = next_clock_level;
+  top->clock = next_clock_level;
   top->eval();
-  top->clock = 1;
-  top->cpuClock = 1;
-  top->eval();
-  nvboard_update();
+  if (trace_started && trace_cycles < TRACE_WINDOW) {
+    soc_trace->dump(contextp->time());
+  }
   contextp->timeInc(1);
+  clock_phase = (clock_phase + 1) % (2 * CPU_CLOCK_RATIO);
+
+  top->cpuClock = 1;
+  next_clock_level = ((clock_phase / CPU_CLOCK_RATIO) & 1) != 0;
+  if (!slow_clock_level && next_clock_level) {
+    slow_clock_rise = true;
+  }
+  slow_clock_level = next_clock_level;
+  top->clock = next_clock_level;
+  top->eval();
+  if (trace_enabled) {
+    const uint32_t pc =
+        top->rootp->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__PC;
+    if (!trace_started && pc >= 0x80000000u) {
+      soc_trace->open("wave.vcd");
+      trace_started = true;
+      printf("[WAVE] recording %llu cycles to wave.vcd\n",
+             (unsigned long long)TRACE_WINDOW);
+    }
+    if (trace_started && trace_cycles < TRACE_WINDOW) {
+      soc_trace->dump(contextp->time());
+      trace_cycles++;
+      if (trace_cycles == TRACE_WINDOW) {
+        soc_trace->close();
+      }
+    }
+  }
+  contextp->timeInc(1);
+  clock_phase = (clock_phase + 1) % (2 * CPU_CLOCK_RATIO);
+
+  if (measure_soc) {
+#if not_include_loading
+    const bool count_this_cycle = app_started;
+    const uint32_t pc =
+        top->rootp->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__PC;
+    if (!app_started && pc >= 0x80000000u) {
+      app_started = true;
+    }
+    if (count_this_cycle) {
+      soc_cycles++;
+      if (top->rootp->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__inst_valid) {
+        soc_instructions++;
+      }
+    }
+#else
+    soc_cycles++;
+    if (top->rootp->SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__inst_valid) {
+      soc_instructions++;
+    }
+#endif
+  }
+
+  if (slow_clock_rise) {
+    nvboard_update();
+  }
 }
 
 int main(int argc, char **argv) {
@@ -95,6 +180,13 @@ int main(int argc, char **argv) {
   contextp->commandArgs(argc, argv);
   top = new VSimTop{contextp};
 
+  trace_enabled = getenv("NPC_WAVEFORM") != nullptr;
+  if (trace_enabled) {
+    contextp->traceEverOn(true);
+    soc_trace = new VerilatedVcdC;
+    top->trace(soc_trace, 99);
+  }
+
   top->clock = 0;
   top->cpuClock = 0;
   top->reset = 1;
@@ -110,11 +202,32 @@ int main(int argc, char **argv) {
   }
 
   top->reset = 0;
+  measure_soc = true;
   while (!simulation_finished) {
     single_cycle();
   }
 
+  printf("total cpuClock cycles = %llu\n",
+         (unsigned long long)soc_cycles);
+  printf("total retired instructions = %llu\n",
+         (unsigned long long)soc_instructions);
+  printf("clock ratio = cpuClock/clock = %d\n", CPU_CLOCK_RATIO);
+#if not_include_loading
+  printf("IPC mode = application only (loader excluded)\n");
+#else
+  printf("IPC mode = SoC total (loader included)\n");
+#endif
+  printf("IPC = %.6f\n",
+         soc_cycles == 0 ? 0.0 :
+         (double)soc_instructions / (double)soc_cycles);
+
   top->final();
+  if (soc_trace != nullptr) {
+    if (trace_started && trace_cycles < TRACE_WINDOW) {
+      soc_trace->close();
+    }
+    delete soc_trace;
+  }
   //nvboard_quit();
   delete top;
   delete contextp;

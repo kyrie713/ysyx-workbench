@@ -6,11 +6,9 @@ module IDU(
   output reg S_TYPE,
   output reg U_TYPE,
   output reg I_TYPE,
-  output reg MemWEn,
   output reg B_TYPE,
   output reg J_TYPE,
   output reg I_jalr,
-  output reg U_lui,
   output reg R_add,
   output reg l_lw,
   output reg l_lbu,
@@ -35,13 +33,13 @@ module IDU(
   wire [31:0] immB = {{20{inst[31]}},inst[7],inst[30:25],inst[11:8],1'b0};
   wire [31:0] immU = {inst[31:12],12'b000000000000};
   wire [31:0] immJ = {{12{inst[31]}},inst[19:12],inst[20],inst[30:21],1'b0};
+  reg U_lui;
   
   always @(*) begin
     R_TYPE = 0;
     I_TYPE_ARITH = 0;
     L_TYPE_LOAD = 0;
     S_TYPE = 0;
-    MemWEn = 0;
     B_TYPE = 0;
     J_TYPE = 0;
     I_jalr = 0;
@@ -90,7 +88,6 @@ module IDU(
         end 
         7'b0100011:begin
             S_TYPE = 1;
-            MemWEn = 1;
             if(funct3 == 3'b010) begin
                 S_sw = 1;//SW
             end

@@ -5,7 +5,6 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
   input wen,
   input [ADDR_WIDTH-1:0] raddr_1,
   input [ADDR_WIDTH-1:0] raddr_2,
-  input rst,
   output [DATA_WIDTH-1:0] rdata_1,
   output [DATA_WIDTH-1:0] rdata_2,
   output [DATA_WIDTH-1:0] debug_a0
@@ -25,7 +24,7 @@ module RegisterFile #(ADDR_WIDTH = 5, DATA_WIDTH = 32) (
 );
       
 /* 寄存器文件 */
-reg [DATA_WIDTH-1:0] rf [2**ADDR_WIDTH-1:0] /*verilator public_flat*/;
+reg [DATA_WIDTH-1:0] rf [2**(ADDR_WIDTH-1)-1:0];
   integer i;
     initial begin
         for (i = 0; i < 32; i = i + 1)
@@ -35,11 +34,11 @@ reg [DATA_WIDTH-1:0] rf [2**ADDR_WIDTH-1:0] /*verilator public_flat*/;
 
 
   always @(posedge clk) begin
-    if (wen && waddr != 0) rf[waddr] <= wdata;
+    if (wen && waddr != 0) rf[waddr[3:0]] <= wdata;
   end
 
-  assign rdata_1 = (raddr_1 == 0) ? 32'b0 : rf[raddr_1];
-  assign rdata_2 = (raddr_2 == 0) ? 32'b0 : rf[raddr_2];
+  assign rdata_1 = (raddr_1 == 0) ? 32'b0 : rf[raddr_1[3:0]];
+  assign rdata_2 = (raddr_2 == 0) ? 32'b0 : rf[raddr_2[3:0]];
   assign debug_a0 = rf[10];
 
   // assign debug_zero = 32'b0;
