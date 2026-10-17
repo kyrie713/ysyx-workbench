@@ -1,4 +1,4 @@
-module IFU(
+module ysyx_25080202_IFU(
     input         clk,
     input         rst,
     input  [31:0] pc,
@@ -54,7 +54,6 @@ module IFU(
                 end
                 default: begin
                     state <= IDLE;
-                    inst_reg <= 32'b0;
                 end
             endcase
         end

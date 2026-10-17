@@ -1,0 +1,28 @@
+// Verilated -*- C++ -*-
+// DESCRIPTION: Verilator output: Prototypes for DPI import and export functions.
+//
+// Verilator includes this file in all generated .cpp files that use DPI functions.
+// Manually include this file where DPI .c import functions are declared to ensure
+// the C functions match the expectations of the DPI imports.
+
+#ifndef VERILATED_VSIMTOP__DPI_H_
+#define VERILATED_VSIMTOP__DPI_H_  // guard
+
+#include "svdpi.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+    // DPI IMPORTS
+    // DPI import at /home/huang/ysyx-workbench/ysyxSoC/perip/flash/flash.v:84:30
+    extern void flash_read(int addr, int* data);
+    // DPI import at /home/huang/ysyx-workbench/npc/vsrc/NPC.v:74:34
+    extern void notify_ebreak(int code);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // guard

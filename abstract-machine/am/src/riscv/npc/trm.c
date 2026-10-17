@@ -4,7 +4,8 @@
 #include <riscv/riscv.h>
 extern char _heap_start;
 int main(const char *args);
-#define __PLATFORM_YSYXSOC 1
+// Abstract Machine defines __PLATFORM_YSYXSOC for both the legacy minirv
+// target and the RV32E ysyxSoC target. Stand-alone NPC uses __PLATFORM_NPC.
 extern char _pmem_start;
 #define PMEM_SIZE (128 * 1024 * 1024)
 #define PMEM_END  ((uintptr_t)&_pmem_start + PMEM_SIZE)

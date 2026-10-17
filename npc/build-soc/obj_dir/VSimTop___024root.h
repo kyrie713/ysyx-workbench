@@ -219,7 +219,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
     struct {
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__i_uart_sync_flops__DOT__flop_0;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__io_ifu_respValid;
-        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_jalr;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_TYPE_ARITH;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__L_TYPE_LOAD;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__S_TYPE;
@@ -227,12 +226,37 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_TYPE;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__B_TYPE;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__J_TYPE;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__I_jalr;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__inst_valid;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrw;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrs;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrc;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrsi;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrwi;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__I_csrrci;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__csr_inst;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_TYPE;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_add;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_sub;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_sltu;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_sll;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_and;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_or;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__R_slt;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__I_addi;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__I_slti;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__I_ori;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__I_andi;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__I_slli;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lbu;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lw;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lb;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lh;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__l_lhu;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__U_lui;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__U_auipc;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__J_jal;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__branch_taken;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_reqValid;
         CData/*1:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_size;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_wen;
@@ -240,11 +264,10 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_respValid;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__lsu_done;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__state;
-        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_load;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__lsu__DOT__is_store;
+        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sh;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sw;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__S_sb;
-        CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__idu__DOT__U_lui;
         CData/*1:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ifu__DOT__state;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__isValidLoad;
         CData/*1:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__bridge0__DOT__stateI;
@@ -258,6 +281,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*2:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__cmp__DOT__io_out_arsize;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__cmp__DOT__io_out_rready;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__cmp__DOT__io_out_rvalid;
+    };
+    struct {
         CData/*3:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__io_qspi_io_di_i;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT___npsram_nmi_ready;
         CData/*3:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__wstrbReg;
@@ -281,8 +306,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*4:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_fsm_state;
         CData/*4:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_fsm_state_tgt;
         CData/*7:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_xfer_ca_bit_cnt;
-    };
-    struct {
         CData/*7:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_xfer_data_bit_cnt;
         CData/*7:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_xfer_byte_data;
         CData/*4:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_3__DOT__mpsram__DOT__npsram__DOT__u_psram_core__DOT__r_ce_cnt;
@@ -324,6 +347,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__sel_0;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__apbxbar__DOT__sel_3;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_awready;
+    };
+    struct {
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_bvalid;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_arready;
         CData/*0:0*/ SimTop__DOT__asic__DOT__soc__DOT__axi4xbar__DOT__auto_anon_in_rvalid;
@@ -343,33 +368,53 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*2:0*/ SimTop__DOT__flash__DOT__state;
         CData/*7:0*/ SimTop__DOT__flash__DOT__counter;
         CData/*7:0*/ SimTop__DOT__flash__DOT__cmd;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_0;
-        CData/*2:0*/ __VdfgRegularize_h6e95ff9d_0_1;
-        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_5;
-        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_7;
-    };
-    struct {
-        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_8;
-        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_9;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_13;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_17;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_19;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_6;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_7;
+        CData/*2:0*/ __VdfgRegularize_h6e95ff9d_0_8;
+        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_13;
+        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_15;
+        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_16;
+        CData/*3:0*/ __VdfgRegularize_h6e95ff9d_0_17;
         CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_20;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_21;
-        CData/*1:0*/ __VdfgRegularize_h6e95ff9d_0_23;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_24;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_25;
         CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_27;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_29;
+        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_29;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_31;
         CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_32;
         CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_33;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_34;
-        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_35;
-        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_36;
-        CData/*1:0*/ __VdfgRegularize_h6e95ff9d_0_38;
+        CData/*1:0*/ __VdfgRegularize_h6e95ff9d_0_35;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_36;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_39;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_42;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_44;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_45;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_46;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_47;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_48;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_49;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_50;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_51;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_52;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_53;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_54;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_55;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_58;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_59;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_60;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_61;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_62;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_63;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_64;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_66;
+        CData/*0:0*/ __VdfgRegularize_h6e95ff9d_0_67;
+        CData/*7:0*/ __VdfgRegularize_h6e95ff9d_0_68;
+        CData/*1:0*/ __VdfgRegularize_h6e95ff9d_0_70;
         CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_awsink__DOT__count;
         CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__count;
         CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_bsource__DOT__count;
         CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__count;
+    };
+    struct {
         CData/*1:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_wsink__DOT__count;
         CData/*3:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__rstate;
         CData/*3:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__receiver__DOT__rcounter16;
@@ -413,8 +458,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         CData/*0:0*/ __Vtrigprevexpr___TOP__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT__extra_ss__0;
         VL_OUT16(externalPins_mygpio_out,15,0);
         VL_IN16(externalPins_mygpio_in,15,0);
-    };
-    struct {
         SData/*15:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__dl;
         SData/*15:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__dlc;
         SData/*9:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__counter_t;
@@ -424,6 +467,7 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         SData/*13:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_11__DOT__u0_spi_top__DOT__ctrl;
         SData/*15:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_11__DOT__u0_spi_top__DOT__clgen__DOT__cnt;
         SData/*15:0*/ SimTop__DOT__asic__DOT__soc__DOT__DefDevice_2__DOT__mgpio__DOT__gpio_out_reg;
+        SData/*9:0*/ __VdfgRegularize_h6e95ff9d_0_5;
         SData/*15:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice__DOT__muart__DOT__Uregs__DOT__dlc;
         SData/*13:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_11__DOT__u0_spi_top__DOT__ctrl;
         SData/*15:0*/ __Vdly__SimTop__DOT__asic__DOT__soc__DOT__DefDevice_1__DOT___GEN_11__DOT__u0_spi_top__DOT__clgen__DOT__cnt;
@@ -435,6 +479,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__elts_0_addr;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_arsink__DOT__io_deq_q__DOT__elts_1_addr;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__io_deq_bits1_rdata;
+    };
+    struct {
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__elts_0_data;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeIn_rsource__DOT__enq_q__DOT__elts_1_data;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cdc__DOT__sink__DOT__nodeOut_wsink__DOT__io_deq_q__DOT__io_enq_bits_data;
@@ -446,6 +492,7 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__PC;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__ALU_OUT;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__imm;
+        IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__load_data;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__next_pc;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__wbu__DOT__regfile__DOT__i;
         IData/*31:0*/ SimTop__DOT__asic__DOT__soc__DOT__cpu__DOT__core0__DOT__exu__DOT__rdata_1;
@@ -479,8 +526,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTop___024root final {
         IData/*23:0*/ SimTop__DOT__espPsram__DOT__psram__DOT__current_address;
         IData/*31:0*/ SimTop__DOT__espPsram__DOT__psram__DOT__unnamedblk1__DOT__i;
         IData/*23:0*/ SimTop__DOT__flash__DOT__addr;
-    };
-    struct {
         IData/*31:0*/ SimTop__DOT__flash__DOT__data;
         IData/*31:0*/ SimTop__DOT__flash__DOT__rdata;
         IData/*23:0*/ __Vdly__SimTop__DOT__flash__DOT__addr;
